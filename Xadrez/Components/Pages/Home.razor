@@ -1,0 +1,32 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+<div id="tabuleiro" class="container">
+    <div class="row">
+        <div class="col"></div>
+        <div class="col text-center fw-bold">A</div>
+        <div class="col text-center fw-bold">B</div>
+        <div class="col text-center fw-bold">C</div>
+        <div class="col text-center fw-bold">D</div>
+        <div class="col text-center fw-bold">E</div>
+        <div class="col text-center fw-bold">F</div>
+        <div class="col text-center fw-bold">G</div>
+        <div class="col text-center fw-bold">H</div>
+    </div>
+    @{int count = 0;}
+    @while (count < Partida.Tabuleiro.Casas.Count)
+    {
+        <div class="row">
+            @for(int i = 1; i <= 8; i++)
+            {
+                @if (count % 8 == 0)
+                {
+                    <div class="col fw-bold text-end align-content-center">@((count / 8) + 1)</div>
+                }
+                var casa = Partida.Tabuleiro.Casas[count];
+                count++;                
+                <div class="col casa @(casa.Cor.ToLower())"></div>
+            }
+        </div>
+    }    
+</div>
