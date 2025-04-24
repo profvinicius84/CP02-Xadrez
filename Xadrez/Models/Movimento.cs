@@ -9,13 +9,8 @@ namespace Xadrez.Models;
 /// <param name="casaOrigem">Representa a casa de origem da peça.</param>
 /// <param name="casaDestino">Representa a casa de destino da peça.</param>
 /// <param name="pecaCapturada">Representa a peça capturada, se houver.</param>
-public class Movimento(Jogador jogador, IPeca peca, Casa casaOrigem, Casa casaDestino, IPeca? pecaCapturada = null)
-{
-    /// <summary>
-    /// Representa o jogador que está realizando o movimento.
-    /// </summary>
-    public Jogador Jogador { get; set; } = jogador;
-
+public class Movimento(IPeca peca, Casa casaOrigem, Casa casaDestino, IPeca? pecaCapturada = null)
+{    
     /// <summary>
     /// Representa a peça que está sendo movida.
     /// </summary>

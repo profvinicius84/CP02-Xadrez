@@ -62,7 +62,7 @@ public class Tabuleiro : ITabuleiro
         //throw new NotImplementedException();
     }
 
-    public bool ValidaMovimento(Movimento movimento)
+    public bool ValidaMovimento(Jogador jogador, Movimento movimento)
     {
         throw new NotImplementedException();
     }
@@ -78,6 +78,16 @@ public class Tabuleiro : ITabuleiro
     }
 
     public Casa ObtemCasaPeca(IPeca peca)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool VerificaXeque(bool eBranca)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool VerificaXequeMate(bool eBranca)
     {
         throw new NotImplementedException();
     }

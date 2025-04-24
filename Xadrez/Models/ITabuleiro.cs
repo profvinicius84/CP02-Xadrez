@@ -17,7 +17,7 @@ public interface ITabuleiro
     /// </summary>
     /// <param name="movimento"></param>
     /// <returns></returns>
-    bool ValidaMovimento(Movimento movimento);
+    bool ValidaMovimento(Jogador jogador, Movimento movimento);
     bool ExecutaMovimento(Movimento movimento);
     bool ReverteMovimento(Movimento movimento);
     Casa ObtemCasaPeca(IPeca peca);
