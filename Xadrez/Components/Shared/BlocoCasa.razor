@@ -1,0 +1,7 @@
+﻿@rendermode InteractiveServer
+
+<div id="casa-@Casa.Codigo.ToLower()" class="col casa p-0 @(Casa.Cor.ToLower()) @StatusOcupcao @CondicaoDisponibilidade">
+    <button class="peca w-100 h-100 p-1 m-0 bg-transparent border-0 @(Casa.Peca is not null && Casa.Peca.EBranca ? "text-white" : "")" @onclick="AoSelecionar ">
+        <i class="@IconePeca"></i>
+    </button>
+</div>

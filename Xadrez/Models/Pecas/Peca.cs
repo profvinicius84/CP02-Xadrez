@@ -1,23 +1,58 @@
-﻿
+﻿namespace Xadrez.Models.Pecas;
 
-namespace Xadrez.Models.Pecas;
-
-public class Peca : IPeca
+/// <summary>
+/// Classe base para todas as peças do jogo de xadrez.
+/// </summary>
+/// <param name="eBranca">Indica se a peça é branca ou preta.</param>
+public abstract class Peca(bool eBranca) : IPeca
 {
-    public bool EBranca => throw new NotImplementedException();
+    /// <summary>
+    /// Indica se a peça é branca ou preta.
+    /// </summary>
+    public bool EBranca { get; } = eBranca;
 
-    public List<Movimento> MovimentosPossiveis(Tabuleiro tabuleiro)
+    /// <summary>
+    /// Indica se a peça foi movimentada ou não.
+    /// </summary>
+    public bool FoiMovimentada { get; set; }
+
+    /// <summary>
+    /// Devolve o código da peça.
+    /// </summary>
+    public string Codigo
     {
-        var movimentos = new List<Movimento>();
-
-        foreach(var casa in tabuleiro.Casas)
+        get 
         {
-            if(casa.Peca.EBranca != this.EBranca)
+            string codigo = "";
+            switch (this)
             {
-                movimentos.Add(new Movimento(this, tabuleiro.ObtemCasaPeca(this), casa, casa.Peca));
+                case ITorre:
+                    codigo = "T";
+                    break;
+                case ICavalo:
+                    codigo = "C";
+                    break;
+                case IBispo:
+                    codigo = "B";
+                    break;
+                case IRainha:
+                    codigo = "D";
+                    break;
+                case IRei:
+                    codigo = "R";
+                    break;
+                case Hades:
+                    codigo = "H";
+                    break;
             }
+            return codigo;
         }
-
-        return movimentos;
     }
+
+    /// <summary>
+    /// Devolve lista de movimentos possíveis para a peça.
+    /// </summary>
+    /// <param name="tabuleiro">O tabuleiro atual do jogo.</param>
+    /// <returns>Uma lista de movimentos possíveis para a peça.</returns>
+    public abstract List<Movimento> MovimentosPossiveis(Tabuleiro tabuleiro);
 }

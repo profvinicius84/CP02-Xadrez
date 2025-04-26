@@ -8,15 +8,15 @@ public interface IPeao : IPeca
     /// <summary>
     /// Verifica se o peão pode ser promovido. Um peão pode ser promovido quando chega na oitava linha (para as brancas) ou na primeira linha (para as pretas) do tabuleiro.
     /// </summary>
-    /// <param name="tabuleiro"></param>
-    /// <returns></returns>
+    /// <param name="tabuleiro">O tabuleiro atual do jogo.</param>
+    /// <returns>Retorna verdadeiro se o peão pode ser promovido, caso contrário, retorna falso.</returns>
     bool VarificaPromocao(Tabuleiro tabuleiro);
 
     /// <summary>
     /// Promove o peão para uma peça de maior valor (dama, torre, bispo ou cavalo).
     /// </summary>
-    /// <param name="tabuleiro"></param>
-    /// <param name="pecaPromocao"></param>
+    /// <param name="tabuleiro">O tabuleiro atual do jogo.</param>
+    /// <param name="pecaPromocao">A peça que o peão se transforma quando é promovido.</param>
     void Promover(Tabuleiro tabuleiro, IPeca pecaPromocao);
 
     /// <summary>

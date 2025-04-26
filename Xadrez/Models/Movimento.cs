@@ -9,7 +9,7 @@ namespace Xadrez.Models;
 /// <param name="casaOrigem">Representa a casa de origem da peça.</param>
 /// <param name="casaDestino">Representa a casa de destino da peça.</param>
 /// <param name="pecaCapturada">Representa a peça capturada, se houver.</param>
-public class Movimento(IPeca peca, Casa casaOrigem, Casa casaDestino, IPeca? pecaCapturada = null)
+public class Movimento(IPeca peca, Casa casaOrigem, Casa casaDestino, IPeca? pecaCapturada = null, bool eRoque = false)
 {    
     /// <summary>
     /// Representa a peça que está sendo movida.
@@ -30,4 +30,15 @@ public class Movimento(IPeca peca, Casa casaOrigem, Casa casaDestino, IPeca? pec
     /// Representa a peça capturada, se houver.
     /// </summary>
     public IPeca? PecaCapturada { get;} = pecaCapturada;
+
+
+    /// <summary>
+    /// Indica se o movimento é um roque ou não.
+    /// </summary>
+    public bool ERoque { get; } = eRoque;
+
+    /// <summary>
+    /// Representa a notação algébrica do movimento.
+    /// </summary>
+    public string NotacaoAlgebrica => $"{Peca.Codigo}{CasaOrigem.Codigo.ToLower()}{(PecaCapturada is not null ? "x" : "")}{CasaDestino.Codigo.ToLower()}";
 }
