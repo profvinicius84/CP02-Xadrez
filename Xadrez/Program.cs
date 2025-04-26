@@ -1,4 +1,3 @@
-using Xadrez.Client.Pages;
 using Xadrez.Components;
 
 var builder = WebApplication.CreateBuilder(args);

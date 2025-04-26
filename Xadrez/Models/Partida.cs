@@ -1,4 +1,6 @@
-﻿namespace Xadrez.Models;
+﻿using Xadrez.Models.Pecas;
+
+namespace Xadrez.Models;
 
 /// <summary>
 /// Representa uma partida de xadrez.
@@ -29,19 +31,37 @@ public class Partida<TTabuleiro> where TTabuleiro : ITabuleiro, new()
     /// <summary>
     /// Movimentos realizados na partida.
     /// </summary>
-    public List<Movimento> Movimentos { get; set; } = new();
+    public Stack<Movimento> Movimentos { get; set; } = new();
 
+    /// <summary>
+    /// Indica o jogador que está jogando no momento.
+    /// </summary>
     public Jogador JogadorDaVez => Movimentos.Count % 2 == 0 ? JogadorBranco : JogadorPreto;
 
     /// <summary>
     /// Construtor da classe Partida.
     /// </summary>
-    /// <param name="jogadorBranco"></param>
-    /// <param name="jogadorPreto"></param>
+    /// <param name="jogadorBranco">Jogador branco da partida.</param>
+    /// <param name="jogadorPreto">Jogador preto da partida.</param>
     public Partida(Jogador jogadorBranco, Jogador jogadorPreto)
     {
         JogadorBranco = jogadorBranco;
         JogadorPreto = jogadorPreto;
-        Tabuleiro.DistribuiPecas();
+
+        #region Tabuleiro.DistribuiPecas();
+        //Peças brancas
+        for (int i = 0; i < 16; i++)
+        {
+            var casa = (Tabuleiro as Tabuleiro).Casas[i];
+            casa.Peca = new Hades(true);
+        }
+
+        //Peças pretas
+        for (int i = (Tabuleiro as Tabuleiro).Casas.Count; i > (Tabuleiro as Tabuleiro).Casas.Count - 16; i--)
+        {
+            var casa = (Tabuleiro as Tabuleiro).Casas[i - 1];
+            casa.Peca = new Hades(false);
+        }
+        #endregion
     }
 }

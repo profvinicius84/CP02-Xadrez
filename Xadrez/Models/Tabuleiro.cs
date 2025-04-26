@@ -59,7 +59,7 @@ public class Tabuleiro : ITabuleiro
 
     public void DistribuiPecas()
     {
-        //throw new NotImplementedException();
+        throw new NotImplementedException();
     }
 
     public bool ValidaMovimento(Jogador jogador, Movimento movimento)
@@ -67,19 +67,19 @@ public class Tabuleiro : ITabuleiro
         throw new NotImplementedException();
     }
 
-    public bool ExecutaMovimento(Movimento movimento)
+    public void ExecutaMovimento(Movimento movimento)
     {
         throw new NotImplementedException();
     }
 
-    public bool ReverteMovimento(Movimento movimento)
+    public void ReverteMovimento(Movimento movimento)
     {
         throw new NotImplementedException();
     }
 
-    public Casa ObtemCasaPeca(IPeca peca)
+    public Casa? ObtemCasaPeca(IPeca peca)
     {
-        throw new NotImplementedException();
+        return Casas.FirstOrDefault(c => c.Peca == peca);
     }
 
     public bool VerificaXeque(bool eBranca)
@@ -88,6 +88,11 @@ public class Tabuleiro : ITabuleiro
     }
 
     public bool VerificaXequeMate(bool eBranca)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool VerificaPerigo(Casa casa, bool eBranca)
     {
         throw new NotImplementedException();
     }

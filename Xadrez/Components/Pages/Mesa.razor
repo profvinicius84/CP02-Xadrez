@@ -1,0 +1,60 @@
+﻿@page "/"
+@rendermode InteractiveServer
+
+<PageTitle>CP 02 - Xadrez</PageTitle>
+<div id="mesa" class="container shadow-lg rounded p-3">
+    <div class="row m-0 p-0">
+        <div class="col-8 m-0 p-0 border-2 rounded">
+            <PainelTabuleiro Partida="Partida" AoMudarEstado="StateHasChanged"  />
+        </div>
+        <div class="col-4 h-100 p-3 bg-panel rounded-3">
+            <!-- Turno atual -->
+            <div class="mb-4">
+                <h5 class="text-uppercase text-muted">Turno</h5>
+                <div id="turnoAtual" class="fs-4 fw-bold text-white">@Partida.JogadorDaVez.Nome</div>
+            </div>            
+
+            <!-- Botões de controle -->
+            <div class="d-grid gap-2 mb-4">
+                <button class="btn btn-neon" @onclick="Reiniciar">Reiniciar</button>
+                <button class="btn btn-neon" @onclick="Desfazer">Desfazer</button>
+            </div>
+
+            <!-- Capturadas -->
+            <div class="mb-4">
+                <h5 class="text-uppercase text-muted">Capturadas</h5>
+                <div class="row bg-primary bg-gradient bg-opacity-50 rounded shadow text-center" style="min-height: 50px; max-height: 250px; overflow:auto; font-size: 1.5em;">
+                    <div class="col-5">
+                        <ol class="list-group mt-2">
+                            @foreach (var peca in Partida.Tabuleiro.PecasBrancasCapturadas)
+                            {
+                                <li class="list-group-item bg-transparent text-white border-0"><i class="@IconePeca(peca)" /></li>
+                            }
+                        </ol>
+                    </div>
+                    <div class="col-5">
+                        <ol class="list-group mt-2">
+                            @foreach (var peca in Partida.Tabuleiro.PecasPretasCapturadas)
+                            {
+                                <li class="list-group-item bg-transparent text-black border-0"><i class="@IconePeca(peca)" /></li>
+                            }
+                        </ol>
+                    </div>
+                </div>                
+            </div>
+
+            <!-- Movimentos -->
+            <div class="mb-4" id="painelMovimentos">
+                <h5 class="text-uppercase text-muted">Movimentos</h5>
+                <div class="row bg-info bg-gradient bg-opacity-50 rounded shadow" style="min-height: 50px; max-height: 250px; overflow:auto; font-size: 1.5em;">
+                    <ol id="listaMovimentos" class="list-group mt-2">
+                        @foreach (var movimento in Partida.Movimentos)
+                        {
+                            <li class="list-group-item bg-transparent border-0 @(movimento.Peca.EBranca? "text-white" : "text-black")"><i class="@IconePeca(movimento.Peca)" /> @movimento.NotacaoAlgebrica</li>
+                        }
+                    </ol>
+                </div>
+            </div>
+        </div>
+	</div>
+</div>
