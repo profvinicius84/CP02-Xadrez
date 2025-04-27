@@ -1,5 +1,5 @@
 ﻿using Xadrez.Models.Pecas;
-
+using System.Linq; // Adicionado para FirstOrDefault
 namespace Xadrez.Models;
 
 /// <summary>
@@ -64,7 +64,24 @@ public class Tabuleiro : ITabuleiro
 
     public bool ValidaMovimento(Jogador jogador, Movimento movimento)
     {
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
+        // ... (outras validações como: é a vez do jogador? a peça é dele?) ...
+        IPeca peca = movimento.Peca;
+        Casa origem = movimento.CasaOrigem;
+        Casa destino = movimento.CasaDestino;
+
+        // Verifica se a peça existe na casa de origem indicada
+        if (origem.Peca != peca)
+        {
+            return false; // Inconsistência, a peça não está onde o movimento diz que está
+        }
+
+        // 1. Calcula TODOS os movimentos possíveis para esta peça a partir da origem
+        List<Movimento> movimentosLegais = peca.MovimentosPossiveis(this);
+
+        // 2. Verifica se o movimento PROPOSTO está entre os movimentos LEGAIS calculados no passo anterior.
+        bool movimentoEncontrado = false;
+        // Continuar a partir do foreach...
     }
 
     public void ExecutaMovimento(Movimento movimento)
