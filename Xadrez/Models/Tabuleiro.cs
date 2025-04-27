@@ -1,4 +1,5 @@
-﻿using Xadrez.Models.Pecas;
+﻿using System.Linq;
+using Xadrez.Models.Pecas;
 
 namespace Xadrez.Models;
 
@@ -84,7 +85,15 @@ public class Tabuleiro : ITabuleiro
 
     public bool VerificaXeque(bool eBranca)
     {
-        throw new NotImplementedException();
+        var rei = (eBranca ? PecasBrancas : PecasPretas).FirstOrDefault(p => p is IRei); //verifica se é branca ou preta e pega as peças certas
+        if (rei == null) return false; // caso não encontre o rei
+
+        var casaRei = ObtemCasaPeca(rei);
+        var inimigos = eBranca ? PecasPretas : PecasBrancas;
+
+        return inimigos.Any(inimigo =>
+            inimigo.MovimentosPossiveis(this).Any(m => m.CasaDestino == casaRei)
+        );
     }
 
     public bool VerificaXequeMate(bool eBranca)
