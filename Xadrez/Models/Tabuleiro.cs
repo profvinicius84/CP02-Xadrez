@@ -92,7 +92,7 @@ public class Tabuleiro : ITabuleiro
         Pecas.AddRange(Casas.Where(c => c.Peca != null).Select(c => c.Peca!));
     }
 
-    public bool ValidaMovimento(Movimento movimento)
+    public bool ValidaMovimento(Jogador jogador, Movimento movimento)
     {
         var movimentosValidos = movimento.Peca.MovimentosPossiveis(this);
         return movimentosValidos.Any(m => m.CasaDestino == movimento.CasaDestino);
@@ -159,8 +159,4 @@ public class Tabuleiro : ITabuleiro
         throw new NotImplementedException();
     }
 
-    public bool ValidaMovimento(Jogador jogador, Movimento movimento)
-    {
-        throw new NotImplementedException();
-    }
 }
