@@ -59,7 +59,37 @@ public class Tabuleiro : ITabuleiro
 
     public void DistribuiPecas()
     {
-        throw new NotImplementedException();
+        Pecas.Clear();
+
+        foreach (var casa in Casas)
+            casa.Peca = null;
+
+        Casas.First(c => c.Linha == 0 && c.Coluna == 0).Peca = new Torre(true);
+        Casas.First(c => c.Linha == 0 && c.Coluna == 1).Peca = new Cavalo(true);
+        Casas.First(c => c.Linha == 0 && c.Coluna == 2).Peca = new Bispo(true);
+        Casas.First(c => c.Linha == 0 && c.Coluna == 3).Peca = new Rainha(true);
+        Casas.First(c => c.Linha == 0 && c.Coluna == 4).Peca = new Rei(true);
+        Casas.First(c => c.Linha == 0 && c.Coluna == 5).Peca = new Bispo(true);
+        Casas.First(c => c.Linha == 0 && c.Coluna == 6).Peca = new Cavalo(true);
+        Casas.First(c => c.Linha == 0 && c.Coluna == 7).Peca = new Torre(true);
+
+        for (int col = 0; col < 8; col++)
+            Casas.First(c => c.Linha == 1 && c.Coluna == col).Peca = new Peao(true);
+
+
+        Casas.First(c => c.Linha == 7 && c.Coluna == 0).Peca = new Torre(false);
+        Casas.First(c => c.Linha == 7 && c.Coluna == 1).Peca = new Cavalo(false);
+        Casas.First(c => c.Linha == 7 && c.Coluna == 2).Peca = new Bispo(false);
+        Casas.First(c => c.Linha == 7 && c.Coluna == 3).Peca = new Rainha(false);
+        Casas.First(c => c.Linha == 7 && c.Coluna == 4).Peca = new Rei(false);
+        Casas.First(c => c.Linha == 7 && c.Coluna == 5).Peca = new Bispo(false);
+        Casas.First(c => c.Linha == 7 && c.Coluna == 6).Peca = new Cavalo(false);
+        Casas.First(c => c.Linha == 7 && c.Coluna == 7).Peca = new Torre(false);
+
+        for (int col = 0; col < 8; col++)
+            Casas.First(c => c.Linha == 6 && c.Coluna == col).Peca = new Peao(false);
+
+        Pecas.AddRange(Casas.Where(c => c.Peca != null).Select(c => c.Peca!));
     }
 
     public bool ValidaMovimento(Movimento movimento)
@@ -70,12 +100,24 @@ public class Tabuleiro : ITabuleiro
 
     public void ExecutaMovimento(Movimento movimento)
     {
-        throw new NotImplementedException();
+        movimento.CasaOrigem.Peca = null;
+
+        if (movimento.PecaCapturada != null)
+            Pecas.Remove(movimento.PecaCapturada);
+
+        movimento.CasaDestino.Peca = movimento.Peca;
+        movimento.Peca.FoiMovimentada = true;
     }
 
     public void ReverteMovimento(Movimento movimento)
     {
-        throw new NotImplementedException();
+        movimento.CasaDestino.Peca = movimento.PecaCapturada;
+        movimento.CasaOrigem.Peca = movimento.Peca;
+
+        if (movimento.PecaCapturada != null)
+            Pecas.Add(movimento.PecaCapturada);
+
+        movimento.Peca.FoiMovimentada = false; 
     }
 
     public Casa? ObtemCasaPeca(IPeca peca)
@@ -90,10 +132,34 @@ public class Tabuleiro : ITabuleiro
 
     public bool VerificaXequeMate(bool eBranca)
     {
-        throw new NotImplementedException();
+        var rei = Pecas.OfType<IRei>().FirstOrDefault(r => r.EBranca == eBranca);
+        if (rei == null || !rei.EmCheque)
+            return false;
+
+        var pecasAliadas = Pecas.Where(p => p.EBranca == eBranca);
+        foreach (var peca in pecasAliadas)
+        {
+            var movimentos = peca.MovimentosPossiveis(this);
+            foreach (var mov in movimentos)
+            {
+                ExecutaMovimento(mov);
+                bool continuaEmCheque = ((IRei)rei).EmCheque;
+                ReverteMovimento(mov);
+
+                if (!continuaEmCheque)
+                    return false;
+            }
+        }
+
+        return true;
     }
 
     public bool VerificaPerigo(Casa casa, bool eBranca)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool ValidaMovimento(Jogador jogador, Movimento movimento)
     {
         throw new NotImplementedException();
     }
