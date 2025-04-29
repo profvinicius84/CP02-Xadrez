@@ -128,11 +128,42 @@ public class Tabuleiro : ITabuleiro
         casaOrigem.Peca = null;
 
         peca.FoiMovimentada = true;
+
+        // Lógica para varificar se o movimento é o roque pode ser adicionada futuramente pelo grupo responsável
     }
 
-    public void ReverteMovimento(Movimento movimento)
+    public void ReverteMovimento(Movimento movimento) // inverso de ExecutaMovimento
     {
-        throw new NotImplementedException();
+        IPeca peca = movimento.Peca; // A peça que FOI movida
+        Casa casaOrigem = movimento.CasaOrigem; // Para onde ela vai voltar
+        Casa casaDestino = movimento.CasaDestino; // De onde ela vai sair
+        IPeca? pecaCapturada = movimento.PecaCapturada; // A peça que FOI capturada (se houve)
+
+        // Coloca a peça de volta na casa de origem
+        casaOrigem.Peca = peca;
+
+        // Limpa a casa de destino (ela fica vazia ou com a peça capturada)
+        casaDestino.Peca = null; // Inicialmente limpamos, a peça capturada volta no próximo passo
+
+        if (pecaCapturada != null) // Houve peça capturada
+        {
+            // Coloca a peça capturada de volta na casa de destino
+            casaDestino.Peca = pecaCapturada;
+            
+            // Remove a peça da lista de capturadas
+            PecasCapturadas.Remove(pecaCapturada);
+
+            // Adiciona a peça de volta à lista de peças ativas no tabuleiro
+            Pecas.Add(pecaCapturada);
+
+            // Seria interessante restaurar o estado de FoiMovimentada caso não tenha movimentos anteriores
+            // ao movimneto revertido, mas isso  exigiria passar a pilha de movimentos ou a partida inteira
+            // como parâmetro, o que complica a assinatura do método ITabuleiro
+            // Como meu grupo ficou responsável pelo meovimento do cavalo não faz sentido ter preocupação com isso
+            // Pois é um refinamento específico futuro e afeta peças que estão no controle de outros grupos
+
+            // Lógica para varificar se o movimento é o roque pode ser adicionada futuramente pelo grupo responsável
+        }
     }
 
     public Casa? ObtemCasaPeca(IPeca peca)
