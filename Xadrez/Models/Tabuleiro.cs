@@ -62,9 +62,10 @@ public class Tabuleiro : ITabuleiro
         throw new NotImplementedException();
     }
 
-    public bool ValidaMovimento(Jogador jogador, Movimento movimento)
+    public bool ValidaMovimento(Movimento movimento)
     {
-        throw new NotImplementedException();
+        var movimentosValidos = movimento.Peca.MovimentosPossiveis(this);
+        return movimentosValidos.Any(m => m.CasaDestino == movimento.CasaDestino);
     }
 
     public void ExecutaMovimento(Movimento movimento)
