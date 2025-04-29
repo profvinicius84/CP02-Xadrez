@@ -37,8 +37,12 @@ public class Movimento(IPeca peca, Casa casaOrigem, Casa casaDestino, IPeca? pec
     /// </summary>
     public bool ERoque { get; } = eRoque;
 
+    public IPeca? PecaMovida { get; internal set; }
+
     /// <summary>
     /// Representa a notação algébrica do movimento.
     /// </summary>
     public string NotacaoAlgebrica => $"{Peca.Codigo}{CasaOrigem.Codigo.ToLower()}{(PecaCapturada is not null ? "x" : "")}{CasaDestino.Codigo.ToLower()}";
+
+    
 }

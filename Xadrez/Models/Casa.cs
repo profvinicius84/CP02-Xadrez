@@ -12,12 +12,12 @@ public class Casa(int linha, int coluna)
     /// <summary>
     /// Representa a linha da casa no tabuleiro.
     /// </summary>
-    public int Linha { get; } = linha;
+    public int Linha { get; set; } = linha;
 
     /// <summary>
     /// Representa a coluna da casa no tabuleiro.
     /// </summary>
-    public int Coluna { get; } = coluna;
+    public int Coluna { get; set; } = coluna;
 
     /// <summary>
     /// Representa o código da casa no tabuleiro (ex: A1, B2, etc.).
