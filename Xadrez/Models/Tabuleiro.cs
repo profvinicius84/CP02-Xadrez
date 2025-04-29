@@ -1,5 +1,5 @@
 ﻿using Xadrez.Models.Pecas;
-using System.Linq; // Adicionado para FirstOrDefault
+using System.Linq; // Adicionado para FirstOrDefault() e Any()
 namespace Xadrez.Models;
 
 /// <summary>
@@ -66,6 +66,8 @@ public class Tabuleiro : ITabuleiro
     {
         //throw new NotImplementedException();
         // ... (outras validações como: é a vez do jogador? a peça é dele?) ...
+        // (isso seria um caso futuro muito específico e foge um pouco do CP ou da parte do CP destinada a meu grupo)
+        
         IPeca peca = movimento.Peca;
         Casa origem = movimento.CasaOrigem;
         Casa destino = movimento.CasaDestino;
@@ -80,8 +82,26 @@ public class Tabuleiro : ITabuleiro
         List<Movimento> movimentosLegais = peca.MovimentosPossiveis(this);
 
         // 2. Verifica se o movimento PROPOSTO está entre os movimentos LEGAIS calculados no passo anterior.
-        bool movimentoEncontrado = false;
-        // Continuar a partir do foreach...
+        //    A expressão lambda (movLegal => ...) define a condição de busca.
+        //    Ela verifica se existe ALGUM 'movLegal' na lista 'movimentosLegais'
+        //    onde a CasaDestino E a PecaCapturada coincidem com as do 'movimento' proposto.
+        bool movimentoValidoPelaPeca = movimentosLegais.Any(movLegal =>
+                                                 movLegal.CasaDestino == destino && // 'destino' é movimento.CasaDestino
+                                                 movLegal.PecaCapturada == movimento.PecaCapturada // Compara peças capturadas (ou null = null)
+                                                 );
+
+        // Se Any() retornou false, significa que nenhum movimento legal corresponde ao proposto.
+        if (!movimentoValidoPelaPeca)
+        {
+            return false; // O movimento proposto não é um dos movimentos possíveis da peça.
+        }
+
+        // ... (outras validações GERAIS do xadrez, como: o movimento deixa o próprio rei em xeque?) ...
+        // (isso seria um caso futuro muito específico e foge um pouco do CP)
+
+        // Se chegou até aqui e passou por outras validações gerais (a serem adicionadas),
+        // o movimento é considerado válido por enquanto.
+        return true;
     }
 
     public void ExecutaMovimento(Movimento movimento)
