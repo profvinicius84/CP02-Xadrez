@@ -64,7 +64,6 @@ public class Tabuleiro : ITabuleiro
 
     public bool ValidaMovimento(Jogador jogador, Movimento movimento)
     {
-        //throw new NotImplementedException();
         // ... (outras validações como: é a vez do jogador? a peça é dele?) ...
         // (isso seria um caso futuro muito específico e foge um pouco do CP ou da parte do CP destinada a meu grupo)
         
@@ -106,7 +105,29 @@ public class Tabuleiro : ITabuleiro
 
     public void ExecutaMovimento(Movimento movimento)
     {
-        throw new NotImplementedException();
+        IPeca peca = movimento.Peca;
+        Casa casaOrigem = movimento.CasaOrigem;
+        Casa casaDestino = movimento.CasaDestino;
+        IPeca? pecaCapturada = movimento.PecaCapturada; // Pode ser null. Vai receber a peça (se tiver) ou null (se não tiver)
+        
+        if (pecaCapturada != null) // Se a houve peça capturada
+        {
+            // Adiciona a peça capturada à lista de capturadas
+            PecasCapturadas.Add(pecaCapturada);
+
+            // Remove a peça capturada da lista principal de peças no tabuleiro
+            Pecas.Remove(pecaCapturada);
+            // Nota: A peça capturada já está "fora" da casaDestino logicamente,
+            // pois a peça que se move vai ocupar essa casa.
+        }
+
+        // Coloca a peça que se moveu na casa de destino
+        casaDestino.Peca = peca;
+
+        // Remove a peça da casa de origem (deixa vazia)
+        casaOrigem.Peca = null;
+
+        peca.FoiMovimentada = true;
     }
 
     public void ReverteMovimento(Movimento movimento)
