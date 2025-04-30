@@ -86,6 +86,9 @@ header h1 {
             background-color: #b58863;
         }
 
+        #tabuleiro .casa .peca {
+            cursor: unset;
+        }
 
         #tabuleiro .casa.selecionada .peca {
             border: solid 3px #0dcaf0 !important;
@@ -99,16 +102,32 @@ header h1 {
             background-color: #dc353580 !important;
         }
 
+        #tabuleiro .casa.perigo-enpassant .peca {            
+            border: solid 3px #dc3535 !important;
+        }
+
+        #tabuleiro .casa.roque .peca {
+            background-color: #19875480 !important;
+        }
+
+        #tabuleiro .casa.atacante-cheque .peca {
+            border: solid 3px #fd7e14 !important;
+        }
+
+        #tabuleiro .casa.cheque .peca {
+            background-color: #fd7e1480 !important;
+        }
+
+        #tabuleiro .casa.roque-torre .peca, #tabuleiro .casa.roque-torre-destino .peca {
+            border: solid 3px #198754 !important;
+        }
+
         #tabuleiro .casa .peca {
             aspect-ratio: 1/1;
             font-size: 2vw;
         }
 
-        #tabuleiro .casa.vazia .peca{
-            cursor: unset;
-        }
-
-        #tabuleiro .casa.disponivel .peca {
+        #tabuleiro .casa.vez .peca, #tabuleiro .casa.disponivel .peca, #tabuleiro .casa.selecionada .peca, #tabuleiro .casa.roque .peca, #tabuleiro .casa.perigo .peca {
             cursor: pointer !important;
         }
 

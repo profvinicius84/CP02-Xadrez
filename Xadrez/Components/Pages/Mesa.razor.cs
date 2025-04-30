@@ -1,4 +1,5 @@
-﻿using Xadrez.Models.Pecas;
+﻿using Xadrez.Models;
+using Xadrez.Models.Pecas;
 
 namespace Xadrez.Components.Pages;
 
@@ -29,7 +30,7 @@ public partial class Mesa
     {
         Jogador1 = new Models.Jogador("Branco", true);
         Jogador2 = new Models.Jogador("Preto", false);
-        Partida = new Models.Partida<Models.Tabuleiro>(Jogador1, Jogador2);            
+        Partida = new Models.Partida<Models.Tabuleiro>(Jogador1, Jogador2);
     }
 
     /// <summary>
@@ -48,16 +49,7 @@ public partial class Mesa
         if (Partida.Movimentos.Count > 0)
         {
             var movimento = Partida.Movimentos.Pop();
-            # region Partida.Tabuleiro.ReverteMovimento(movimento)
-            movimento.CasaOrigem.Peca = movimento.Peca;
-            movimento.CasaDestino.Peca = null;
-            if (movimento.PecaCapturada is not null)
-            {
-                movimento.CasaDestino.Peca = movimento.PecaCapturada;
-                Partida.Tabuleiro.PecasCapturadas.Remove(movimento.CasaDestino.Peca);
-                movimento.CasaDestino.Peca.FoiMovimentada = Partida.Movimentos.ToList().Exists(m => m.Peca == movimento.CasaDestino.Peca);
-            }
-            #endregion
+            Partida.Tabuleiro.ReverteMovimento(movimento);
         }
     }
 
@@ -71,7 +63,7 @@ public partial class Mesa
         string icone = "fa-solid ";
         switch (peca)
         {
-            case IPeao:
+            case IPeao:                
                 icone += "fa-chess-pawn";
                 break;
             case ITorre:
@@ -94,5 +86,14 @@ public partial class Mesa
                 break;
         }
         return icone;
+    }
+
+    
+    public string IconePecaMovimento(Movimento movimento)
+    {   
+        if (!movimento.AtivaPromocao && movimento.Peca is IPeao && (movimento.Peca as IPeao).PecaPromocao is not null)
+            return IconePeca((movimento.Peca as IPeao).PecaPromocao);
+
+        return IconePeca(movimento.Peca);
     }
 }

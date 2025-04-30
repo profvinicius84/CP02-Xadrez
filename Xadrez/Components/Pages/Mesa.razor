@@ -28,7 +28,7 @@
                         <ol class="list-group mt-2">
                             @foreach (var peca in Partida.Tabuleiro.PecasBrancasCapturadas)
                             {
-                                <li class="list-group-item bg-transparent text-white border-0"><i class="@IconePeca(peca)" /></li>
+                                <li class="list-group-item bg-transparent text-white border-0"><i class="@IconePeca(peca is Models.Pecas.IPeao && (peca as Models.Pecas.IPeao).PecaPromocao is not null ? (peca as Models.Pecas.IPeao).PecaPromocao : peca)" /></li>
                             }
                         </ol>
                     </div>
@@ -36,7 +36,7 @@
                         <ol class="list-group mt-2">
                             @foreach (var peca in Partida.Tabuleiro.PecasPretasCapturadas)
                             {
-                                <li class="list-group-item bg-transparent text-black border-0"><i class="@IconePeca(peca)" /></li>
+                                <li class="list-group-item bg-transparent text-black border-0"><i class="@IconePeca(peca is Models.Pecas.IPeao && (peca as Models.Pecas.IPeao).PecaPromocao is not null ? (peca as Models.Pecas.IPeao).PecaPromocao : peca)" /></li>
                             }
                         </ol>
                     </div>
@@ -50,7 +50,7 @@
                     <ol id="listaMovimentos" class="list-group mt-2">
                         @foreach (var movimento in Partida.Movimentos)
                         {
-                            <li class="list-group-item bg-transparent border-0 @(movimento.Peca.EBranca? "text-white" : "text-black")"><i class="@IconePeca(movimento.Peca)" /> @movimento.NotacaoAlgebrica</li>
+                            <li class="list-group-item bg-transparent border-0 @(movimento.Peca.EBranca? "text-white" : "text-black")"><i class="@IconePecaMovimento(movimento)" /> @movimento.NotacaoAlgebrica</li>
                         }
                     </ol>
                 </div>

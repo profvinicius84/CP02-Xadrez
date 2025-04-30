@@ -35,8 +35,14 @@ public partial class BlocoCasa
         {
             if (Casa.Peca is null)
                 return "";
+            
+            var peca = Casa.Peca;
+
+            if (Casa.Peca is IPeao && (Casa.Peca as IPeao).PecaPromocao is not null)
+                peca = (Casa.Peca as IPeao).PecaPromocao;
+
             string icone = "fa-solid ";
-            switch (Casa.Peca)
+            switch (peca)
             {
                 case IPeao:
                     icone += "fa-chess-pawn";
@@ -73,5 +79,12 @@ public partial class BlocoCasa
         {
             return Casa.Peca is null ? "vazia" : "ocupada";
         }
-    }    
+    }
+    
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (Casa.Peca is not null && Casa.Peca.EBranca)
+            CondicaoDisponibilidade = "vez";
+    }
 }

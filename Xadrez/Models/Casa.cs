@@ -27,7 +27,7 @@ public class Casa(int linha, int coluna)
     /// <summary>
     /// Representa a cor da casa no tabuleiro.
     /// </summary>
-    public string Cor => (Linha + Coluna) % 2 == 0 ? "Branca" : "Preta";    
+    public string Cor => (Linha + Coluna) % 2 == 0 ? "Preta" : "Branca";    
 
     /// <summary>
     /// Representa a peça que ocupa a casa, se houver.

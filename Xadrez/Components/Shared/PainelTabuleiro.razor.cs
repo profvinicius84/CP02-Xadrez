@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Xadrez.Models;
+using Xadrez.Models.Pecas;
 
 namespace Xadrez.Components.Shared;
 
@@ -8,11 +9,29 @@ namespace Xadrez.Components.Shared;
 /// </summary>
 public partial class PainelTabuleiro
 {
+
     /// <summary>
-    /// Representa o tabuleiro de xadrez.
+    /// Partida de xadrez que contém o tabuleiro e as peças.
+    /// </summary>
+    private Models.Partida<Models.Tabuleiro> _partida;
+
+
+    /// <summary>
+    /// Representa a partida de xadrez associada ao painel do tabuleiro.
     /// </summary>
     [Parameter]
-    public Models.Partida<Models.Tabuleiro> Partida { get; set; }
+    public Models.Partida<Models.Tabuleiro> Partida {
+        get
+        {
+            return _partida;
+        }
+        set
+        {
+            _partida = value;
+            if(_partida is not null)            
+                AtualizaCondicaoDisponibilidadeCasas();
+        }
+    }
 
     /// <summary>
     /// Evento que é chamado quando o estado do tabuleiro muda.
@@ -43,8 +62,13 @@ public partial class PainelTabuleiro
     {
         if (PecaSelecionada is null && casa.Peca is not null && Partida.JogadorDaVez.EBranco == casa.Peca.EBranca)
         {
-            PecaSelecionada = casa.Peca;
-            MovimentosPossiveisPecaSelecionada.AddRange(PecaSelecionada.MovimentosPossiveis(Partida.Tabuleiro));
+            var movimentos = casa.Peca.MovimentosPossiveis(Partida.Tabuleiro);
+            casa.Peca.ObtemEstrategiaMovimento(Partida.Tabuleiro).ValidaMovimentos(movimentos);
+            if (movimentos.Count > 0)
+            {
+                PecaSelecionada = casa.Peca;
+                MovimentosPossiveisPecaSelecionada.AddRange(movimentos);
+            }
         }
         else if (casa.Peca is not null && casa.Peca == PecaSelecionada)
         {
@@ -55,17 +79,11 @@ public partial class PainelTabuleiro
         {
             var movimento = MovimentosPossiveisPecaSelecionada.First(m => m.CasaDestino == casa);
 
-            #region Partida.Tabuleiro.ExecutaMovimento(movimento);
-            if (movimento.CasaDestino.Peca is not null)
-                Partida.Tabuleiro.PecasCapturadas.Add(movimento.CasaDestino.Peca);
-            movimento.CasaOrigem.Peca = null;
-            movimento.CasaDestino.Peca = movimento.Peca;
-            movimento.Peca.FoiMovimentada = true;
+            Partida.Tabuleiro.ExecutaMovimento(movimento);            
             PecaSelecionada = null;
             MovimentosPossiveisPecaSelecionada.Clear();
             Partida.Movimentos.Push(movimento);
             AoMudarEstado.InvokeAsync();
-            #endregion
         }
         AtualizaCondicaoDisponibilidadeCasas();
     }
@@ -75,17 +93,55 @@ public partial class PainelTabuleiro
     /// </summary>
     public void AtualizaCondicaoDisponibilidadeCasas()
     {
-        foreach (var casa in Partida.Tabuleiro.Casas)
+        if (BlocosCasa.Count > 0)
         {
-            BlocosCasa[casa.Codigo].CondicaoDisponibilidade = "";
-            if (PecaSelecionada is not null && casa.Peca == PecaSelecionada)
-                BlocosCasa[casa.Codigo].CondicaoDisponibilidade = "selecionada";
-            else if (MovimentosPossiveisPecaSelecionada is not null)
+            Partida.Tabuleiro.Casas.ForEach(c => BlocosCasa[c.Codigo].CondicaoDisponibilidade = "");
+            if (PecaSelecionada is not null)
+                BlocosCasa[Partida.Tabuleiro.ObtemCasaPeca(PecaSelecionada).Codigo].CondicaoDisponibilidade = "selecionada";
+            else
+                Partida.Tabuleiro.Casas.FindAll(c => c.Peca?.EBranca == Partida.JogadorDaVez.EBranco).ForEach(c => BlocosCasa[c.Codigo].CondicaoDisponibilidade = "vez");
+
+            foreach (var movimento in MovimentosPossiveisPecaSelecionada)
             {
-                if (MovimentosPossiveisPecaSelecionada.Exists(m => m.CasaDestino == casa && m.PecaCapturada is not null))
-                    BlocosCasa[casa.Codigo].CondicaoDisponibilidade = "perigo";
-                else if (MovimentosPossiveisPecaSelecionada.Exists(m => m.CasaDestino == casa))
-                    BlocosCasa[casa.Codigo].CondicaoDisponibilidade = "disponivel";
+                var blocoCasa = BlocosCasa[movimento.CasaDestino.Codigo];
+                if (movimento.PecaCapturada is not null)
+                {
+                    blocoCasa.CondicaoDisponibilidade = "perigo";
+                    if (movimento.EnPassant)
+                        BlocosCasa[Partida.Tabuleiro.ObtemCasaPeca(movimento.PecaCapturada).Codigo].CondicaoDisponibilidade += " perigo-enpassant";
+                }
+                else if (movimento.ERoque)
+                {
+                    blocoCasa.CondicaoDisponibilidade = "roque";
+                    if (movimento.CasaDestino.Coluna == 6) //Roque pequeno
+                    {
+                        BlocosCasa[Partida.Tabuleiro.ObtemCasaCoordenadas(movimento.CasaDestino.Linha, 5).Codigo].CondicaoDisponibilidade += " roque-torre-destino";
+                        BlocosCasa[Partida.Tabuleiro.ObtemCasaCoordenadas(movimento.CasaDestino.Linha, 7).Codigo].CondicaoDisponibilidade += " roque-torre";
+                    }
+                    else //Roque grande
+                    {
+                        BlocosCasa[Partida.Tabuleiro.ObtemCasaCoordenadas(movimento.CasaDestino.Linha, 3).Codigo].CondicaoDisponibilidade += " roque-torre-destino";
+                        BlocosCasa[Partida.Tabuleiro.ObtemCasaCoordenadas(movimento.CasaDestino.Linha, 0).Codigo].CondicaoDisponibilidade += " roque-torre";
+                    }
+                }
+                else
+                {
+                    blocoCasa.CondicaoDisponibilidade += " disponivel";
+                }
+            }
+
+            var casaRei = Partida.Tabuleiro.Casas.FirstOrDefault(c => c.Peca is IRei && c.Peca.EBranca == Partida.JogadorDaVez.EBranco);
+            if (Partida.Tabuleiro.VerificaXequeMate(Partida.JogadorDaVez.EBranco))
+            {
+                int a = 1;
+            }
+            else if (Partida.Tabuleiro.VerificaXeque(Partida.JogadorDaVez.EBranco))
+            {
+                BlocosCasa[casaRei.Codigo].CondicaoDisponibilidade += " cheque";
+                foreach (var movimentoCheque in Partida.Tabuleiro.ObtemMovimentosAtaqueCheque(Partida.JogadorDaVez.EBranco))
+                {
+                    BlocosCasa[movimentoCheque.CasaOrigem.Codigo].CondicaoDisponibilidade += " atacante-cheque";
+                }
             }
         }
     }    

@@ -10,17 +10,21 @@ public interface IPeao : IPeca
     /// </summary>
     /// <param name="tabuleiro">O tabuleiro atual do jogo.</param>
     /// <returns>Retorna verdadeiro se o peão pode ser promovido, caso contrário, retorna falso.</returns>
-    bool VarificaPromocao(Tabuleiro tabuleiro);
+    bool VarificaPromocao(ITabuleiro tabuleiro);
 
     /// <summary>
     /// Promove o peão para uma peça de maior valor (dama, torre, bispo ou cavalo).
-    /// </summary>
-    /// <param name="tabuleiro">O tabuleiro atual do jogo.</param>
+    /// </summary>    
     /// <param name="pecaPromocao">A peça que o peão se transforma quando é promovido.</param>
-    void Promover(Tabuleiro tabuleiro, IPeca pecaPromocao);
+    void Promover(IPeca pecaPromocao);
+
+    /// <summary>
+    /// Remove a promoção do peão.
+    /// </summary>
+    void Despromover();
 
     /// <summary>
     /// Peca que o peão se transforma quando é promovido.
     /// </summary>
-    IPeca PecaPromocao { get; set; }
+    IPeca? PecaPromocao { get; }
 }
