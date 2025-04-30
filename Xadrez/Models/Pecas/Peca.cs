@@ -11,6 +11,7 @@ public abstract class Peca(bool eBranca) : IPeca
     /// </summary>
     public bool EBranca { get; } = eBranca;
 
+
     /// <summary>
     /// Indica se a peça foi movimentada ou não.
     /// </summary>

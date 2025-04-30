@@ -60,8 +60,63 @@ public class Tabuleiro : ITabuleiro
 
     public void DistribuiPecas()
     {
-        throw new NotImplementedException();
+        Pecas.Clear();
+
+        foreach (var casa in Casas)
+            casa.Peca = null;
+
+        // Helper para achar uma casa
+        Casa GetCasa(int linha, int coluna) =>
+            Casas.Single(c => c.Linha == linha && c.Coluna == coluna);
+
+        //Peões brancos na linha 1
+        for (int col = 0; col < 8; col++)
+        {
+            var p = new Peao(true);
+            var casa = GetCasa(1, col);
+            casa.Peca = p;
+            Pecas.Add(p);
+        }
+
+        //Peças da linha 0 (torre, cavalo, bispo, dama, rei, bispo, cavalo, torre)
+        IPeca[] ordemBackRankBranca = {
+            new ITorre(true),  new Cavalo(true), new Bispo(true),  new Rainha(true),
+            new Rei(true),    new Bispo(true),  new Cavalo(true), new Torre(true)
+        };
+        for (int col = 0; col < 8; col++)
+        {
+            var p = ordemBackRankBranca[col];
+            var casa = GetCasa(0, col);
+            casa.Peca = p;
+            p.Casa = casa;
+            Pecas.Add(p);
+        }
+
+        //Peões pretos na linha 6
+        for (int col = 0; col < 8; col++)
+        {
+            var p = new Piao(false);
+            var casa = GetCasa(6, col);
+            casa.Peca = p;
+            p.Casa = casa;
+            Pecas.Add(p);
+        }
+
+        //Peças da linha 7 (igual à branca, mas com cor preta)
+        IPeca[] ordemBackRankPreta = {
+            new Torre(false),  new Cavalo(false), new Bispo(false),  new Rainha(false),
+            new Rei(false),    new Bispo(false),   new Cavalo(false), new Torre(false)
+        };
+        for (int col = 0; col < 8; col++)
+        {
+            var p = ordemBackRankPreta[col];
+            var casa = GetCasa(7, col);
+            casa.Peca = p;
+            p.Casa = casa;
+            Pecas.Add(p);
+        }
     }
+    
 
     public bool ValidaMovimento(Jogador jogador, Movimento movimento)
     {
