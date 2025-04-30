@@ -3,4 +3,4 @@
 /// <summary>
 /// Interface que representa uma peça de xadrez do tipo Rainha.
 /// </summary>
-public interface IRainha : IPeca { }
+public interface IRainha : IPeca {}
