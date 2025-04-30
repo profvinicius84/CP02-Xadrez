@@ -59,7 +59,21 @@ public class Tabuleiro : ITabuleiro
 
     public void DistribuiPecas()
     {
-        throw new NotImplementedException();
+        // Exemplo: adicionar dois cavalos, um branco e um preto
+        AdicionaPeca(new Cavalo(true), 0, 1);  // Branco (B)
+        AdicionaPeca(new Cavalo(true), 0, 6);  // Branco (B)
+        AdicionaPeca(new Cavalo(false), 7, 1); // Preto (P)
+        AdicionaPeca(new Cavalo(false), 7, 6); // Preto (P)
+    }
+
+    private void AdicionaPeca(IPeca peca, int linha, int coluna)
+    {
+        Casa? casa = Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == coluna);
+        if (casa != null)
+        {
+            casa.Peca = peca;
+            Pecas.Add(peca);
+        }
     }
 
     public bool ValidaMovimento(Jogador jogador, Movimento movimento)
