@@ -57,9 +57,21 @@ public class Tabuleiro : ITabuleiro
         }
     }
 
-    public void DistribuiPecas()
+    public void DistribuiPecas() {
+        // Adicionando os Reis
+        AdicionaPeca(new Rei(true), 0, 4);  // Rei Branco
+        AdicionaPeca(new Rei(false), 7, 4); // Rei Preto
+
+    }
+
+    private void AdicionaPeca(IPeca peca, int linha, int coluna)
     {
-        throw new NotImplementedException();
+        Casa? casa = Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == coluna);
+        if (casa != null)
+        {
+            casa.Peca = peca;
+            Pecas.Add(peca);
+        }
     }
 
     public bool ValidaMovimento(Jogador jogador, Movimento movimento)
