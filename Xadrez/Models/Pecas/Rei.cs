@@ -21,6 +21,7 @@ public class Rei(bool eBranca) : Peca(eBranca), IRei
         {  1, -1 }, {  1, 0 }, {  1, 1 }
         };
 
+
         for (int i = 0; i < direcoes.GetLength(0); i++)
         {
             int novaLinha = origem.Linha + direcoes[i, 0];
