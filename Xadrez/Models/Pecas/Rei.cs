@@ -1,20 +1,21 @@
 ﻿using System;
+using System.Linq;
 
 namespace Xadrez.Models.Pecas
 {
-    public class Rei : Peca, IRei
+    public class Rei(bool eBranca) : Peca(eBranca), IRei
     {
         public bool EmCheque { get; set; }
 
         public bool RoqueExecutado { get; private set; }
         public bool FoiMovimentada { get; set; }
 
-        public Rei(bool eBranca) : base(eBranca)
-        {
-            EmCheque = false;
-            RoqueExecutado = false;
-            FoiMovimentada = false;
-        }
+        //public Rei(bool eBranca) : base(eBranca)
+        //{
+        //    EmCheque = false;
+        //    RoqueExecutado = false;
+        //    FoiMovimentada = false;
+        //}
 
         public bool VerificaRoque(Tabuleiro tabuleiro, bool roquePequeno = false)
         {
@@ -110,11 +111,13 @@ namespace Xadrez.Models.Pecas
 
             if (casaRei == null) return movimentos;
 
-            int linha = casaRei.Linha;
-            int coluna = casaRei.Coluna;
+            //foreach (var casa in tabuleiro.Casas)
+            //{
+                int linha = casaRei.Linha;
+                int coluna = casaRei.Coluna;
 
-            var direcoes = new (int linha, int coluna)[]
-            {
+                var direcoes = new (int linha, int coluna)[]
+                {
                 (-1, 0),
                 (1, 0),
                 (0, -1),
@@ -123,26 +126,35 @@ namespace Xadrez.Models.Pecas
                 (-1, 1),
                 (1, -1),
                 (1, 1),
-            };
+                };
 
-            foreach (var (dLinha, dColuna) in direcoes)
-            {
-                int novaLinha = linha + dLinha;
-                int novaColuna = coluna + dColuna;
-
-                if (novaLinha >= 0 && novaLinha < 8 && novaColuna >= 0 && novaColuna < 8)
+                // Adcionado para atender a direção do roque
+                if (linha == 0 && coluna == 4)
                 {
-                    var casaDestino = tabuleiro.Casas.FirstOrDefault(c => c.Linha == novaLinha && c.Coluna == novaColuna);
+                    var novaDirecao = (0, 3);
+                    Array.Resize(ref direcoes, direcoes.Length + 1);
+                    direcoes[^1] = novaDirecao;
+                }
 
-                    if (casaDestino?.Peca == null || casaDestino.Peca.EBranca != EBranca)
+                foreach (var (dLinha, dColuna) in direcoes)
+                {
+                    int novaLinha = linha + dLinha;
+                    int novaColuna = coluna + dColuna;
+
+                    if (novaLinha >= 0 && novaLinha < 8 && novaColuna >= 0 && novaColuna < 8)
                     {
-                        if (!tabuleiro.VerificaXeque(true))
-                        {
-                            movimentos.Add(new Movimento(this, casaRei, casaDestino));
-                        }
+                        var casaDestino = tabuleiro.Casas.FirstOrDefault(c => c.Linha == novaLinha && c.Coluna == novaColuna);
+
+                        //if (casaDestino?.Peca == null || casaDestino.Peca.EBranca != EBranca)
+                        //{
+                        //if (!tabuleiro.VerificaXeque(true))
+                        //{
+                        movimentos.Add(new Movimento(this, casaRei, casaDestino));
+                        //}
+                        //}
                     }
                 }
-            }
+            //}
 
             return movimentos;
         }
