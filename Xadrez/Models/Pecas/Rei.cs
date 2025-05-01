@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace Xadrez.Models.Pecas
 {
@@ -20,9 +18,6 @@ namespace Xadrez.Models.Pecas
 
         public bool VerificaRoque(Tabuleiro tabuleiro, bool roquePequeno = false)
         {
-            if (FoiMovimentada)  // Verifica se o rei já se movimentou
-                return false;
-
             if (RoqueExecutado)
                 throw new InvalidOperationException("O roque já foi executado e não pode ser feito novamente.");
 
@@ -40,9 +35,9 @@ namespace Xadrez.Models.Pecas
             if (casaTorre?.Peca is not ITorre torre || torre.EBranca != EBranca)
                 return false;
 
-            // Verificar se o rei ou a torre ainda estão nas casas originais
-            var casaReiInicial = tabuleiro.Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == 4);
-            var casaTorreInicial = casaTorre;
+            // Verificar se rei ou torre ainda estão em suas casas originais
+            var casaReiInicial = tabuleiro.Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == 4); 
+            var casaTorreInicial = casaTorre; 
 
             bool reiMoveu = casaReiInicial?.Peca != this;
             bool torreMoveu = casaTorreInicial?.Peca != torre;
@@ -65,6 +60,7 @@ namespace Xadrez.Models.Pecas
 
             return true;
         }
+
 
         public Movimento ExecutaRoque(Tabuleiro tabuleiro, bool roquePequeno = false)
         {
@@ -103,10 +99,7 @@ namespace Xadrez.Models.Pecas
             // Marcar que o roque foi executado
             RoqueExecutado = true;
 
-            // Marcar que o rei foi movimentado
-            FoiMovimentada = true;
-
-            // Retorna o movimento de roque, configurando a flag ERoque como true
+            // Retorna o movimento realizado (movimento do rei)
             return new Movimento(this, casaRei, destinoRei);
         }
 
