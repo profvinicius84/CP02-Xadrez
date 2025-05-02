@@ -41,6 +41,9 @@ public abstract class Peca(bool eBranca) : IPeca
                 case IRei:
                     codigo = "R";
                     break;
+                case IPeao:
+                    codigo = "P";
+                    break;
                 case Hades:
                     codigo = "H";
                     break;

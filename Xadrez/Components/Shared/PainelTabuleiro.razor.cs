@@ -55,12 +55,8 @@ public partial class PainelTabuleiro
         {
             var movimento = MovimentosPossiveisPecaSelecionada.First(m => m.CasaDestino == casa);
 
-            #region Partida.Tabuleiro.ExecutaMovimento(movimento);
-            if (movimento.CasaDestino.Peca is not null)
-                Partida.Tabuleiro.PecasCapturadas.Add(movimento.CasaDestino.Peca);
-            movimento.CasaOrigem.Peca = null;
-            movimento.CasaDestino.Peca = movimento.Peca;
-            movimento.Peca.FoiMovimentada = true;
+            #region 
+            Partida.Tabuleiro.ExecutaMovimento(movimento);
             PecaSelecionada = null;
             MovimentosPossiveisPecaSelecionada.Clear();
             Partida.Movimentos.Push(movimento);
