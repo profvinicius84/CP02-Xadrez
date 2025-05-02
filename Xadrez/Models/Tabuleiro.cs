@@ -80,25 +80,24 @@ public class Tabuleiro : ITabuleiro
 
         //Peças da linha 0 (torre, cavalo, bispo, dama, rei, bispo, cavalo, torre)
         IPeca[] ordemBackRankBranca = {
-            new ITorre(true),  new Cavalo(true), new Bispo(true),  new Rainha(true),
+            new Torre(true),  new Cavalo(true), new Bispo(true),  new Rainha(true),
             new Rei(true),    new Bispo(true),  new Cavalo(true), new Torre(true)
         };
+
         for (int col = 0; col < 8; col++)
         {
             var p = ordemBackRankBranca[col];
             var casa = GetCasa(0, col);
             casa.Peca = p;
-            p.Casa = casa;
             Pecas.Add(p);
         }
 
         //Peões pretos na linha 6
         for (int col = 0; col < 8; col++)
         {
-            var p = new Piao(false);
+            var p = new Peao(false);
             var casa = GetCasa(6, col);
             casa.Peca = p;
-            p.Casa = casa;
             Pecas.Add(p);
         }
 
@@ -112,7 +111,6 @@ public class Tabuleiro : ITabuleiro
             var p = ordemBackRankPreta[col];
             var casa = GetCasa(7, col);
             casa.Peca = p;
-            p.Casa = casa;
             Pecas.Add(p);
         }
     }
