@@ -118,21 +118,23 @@ public class Tabuleiro : ITabuleiro
 
     public bool ValidaMovimento(Jogador jogador, Movimento movimento)
     {
+        // Verificando se a peça que quer mexer é da mesma cor que o jogador
         if (movimento.Peca.EBranca != jogador.EBranco)
             return false;
 
+        //Verifica se a peça realmente está na casa de origem indicada
         if (movimento.CasaOrigem.Peca != movimento.Peca)
             return false;
 
+        //Verifica se a casa destino já possui uma peça, e se essa peça é da mesma cor do jogador
         if (movimento.CasaDestino.Peca != null && movimento.CasaDestino.Peca.EBranca == jogador.EBranco)
             return false;
 
+        //Verifica se o movimento está entre os movimento válidos da peça
         if (!movimento.Peca.MovimentosPossiveis(this).Any(m => m.CasaDestino == movimento.CasaDestino))
             return false;
 
-        if (movimento.PecaCapturada != null && movimento.PecaCapturada != movimento.CasaDestino.Peca)
-            return false;
-
+        // Guarda as referências às casas e peças envolvidas
         var origem = movimento.CasaOrigem;
         var destino = movimento.CasaDestino;
 
@@ -143,6 +145,8 @@ public class Tabuleiro : ITabuleiro
         origem.Peca = null;
         destino.Peca = pecaOrigem;
 
+        // Verifica se, após o movimento, o rei do jogador está em xeque
+
         bool reiEmXeque = VerificaXeque(jogador.EBranco);
 
         // Desfaz o movimento
@@ -151,6 +155,8 @@ public class Tabuleiro : ITabuleiro
 
         if (reiEmXeque)
             return false;
+
+        // Se for um movimento de roque, valida se o roque é permitido
 
         if (movimento.ERoque && movimento.Peca is Rei rei)
         {
@@ -163,7 +169,43 @@ public class Tabuleiro : ITabuleiro
 
     public void ExecutaMovimento(Movimento movimento)
     {
-        throw new NotImplementedException();
+
+        var origem = movimento.CasaOrigem;
+        var destino = movimento.CasaDestino;
+
+        var pecaOrigem = origem.Peca;
+        var pecaDestino = destino.Peca;
+
+        if(destino.Peca != null)
+        {
+            if (origem.Peca.EBranca)
+            {
+                PecasPretas.Remove(destino.Peca);
+                PecasPretasCapturadas.Add(destino.Peca);
+            }
+            else
+            {
+                PecasBrancas.Remove(destino.Peca);
+                PecasBrancasCapturadas.Add(destino.Peca);
+            }
+        }
+
+        origem.Peca = null;
+        destino.Peca = pecaOrigem;
+
+
+        if(movimento.Peca is Rei rei)
+        {
+            if(!rei.FoiMovimentada && movimento.ERoque)
+            {
+                rei.ExecutaRoque(this);
+            }
+            else
+            {
+                rei.FoiMovimentada = true;
+            }
+                
+        }
     }
 
     public void ReverteMovimento(Movimento movimento)
