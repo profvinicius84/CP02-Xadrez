@@ -58,15 +58,17 @@ public class Tabuleiro : ITabuleiro
         }
     }
 
-    //Feito
+    
     public void DistribuiPecas()
     {
+        // Limpa a lista atual de peças do tabuleiro para começarmos um jogo do 0
         Pecas.Clear();
 
+        // Remove todas as peças atualmente colocadas nas casas
         foreach (var casa in Casas)
             casa.Peca = null;
 
-        // Helper para achar uma casa
+        // Função auxiliar para obter uma casa com base em linha e coluna
         Casa GetCasa(int linha, int coluna) =>
             Casas.Single(c => c.Linha == linha && c.Coluna == coluna);
 
@@ -178,7 +180,8 @@ public class Tabuleiro : ITabuleiro
         var pecaOrigem = origem.Peca;
         var pecaDestino = destino.Peca;
 
-        if(destino.Peca != null)
+        // Se há uma peça na casa de destino, trata como captura
+        if (destino.Peca != null)
         {
             if (origem.Peca.EBranca)
             {
@@ -192,19 +195,21 @@ public class Tabuleiro : ITabuleiro
             }
         }
 
+        // Move a peça de origem para o destino
         origem.Peca = null;
         destino.Peca = pecaOrigem;
-        
 
 
+        // Trata o roque, se a peça movida for um rei
         if (movimento.Peca is Rei rei)
         {
-            if(!rei.FoiMovimentada && movimento.ERoque)
+            if (rei.VerificaRoque(this))
             {
                 rei.ExecutaRoque(this);
             }
             else
             {
+                // Caso contrário, apenas marca que o rei foi movimentado
                 rei.FoiMovimentada = true;
             }
                 
