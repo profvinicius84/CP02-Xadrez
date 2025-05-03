@@ -1,16 +1,7 @@
 ﻿namespace Xadrez.Models.Pecas
 {
-    public class Rei : IRei
+    public class Rei(bool eBranca) : IRei
     {
-
-
-        /// <summary>
-        /// Indica se a peça é uma branca ou não.
-        /// </summary>
-        public Rei(bool eBranca)
-        : base(eBranca)
-        {
-        }
 
         /// <summary>
         /// Indica se a peça foi movimentada ou não.
@@ -30,7 +21,9 @@
         /// <summary>
         /// Indica se o rei está em cheque ou não.
         /// </summary>
-        bool EmCheque { get; set; }
+        public bool EmCheque { get; set; }
+
+        public bool EBranca { get; set; }
 
         /// <summary>
         /// Verifica se o rei pode fazer o roque (pequeno ou grande).

@@ -1,6 +1,6 @@
 ﻿namespace Xadrez.Models.Pecas
 {
-    public class Peao : IPeao
+    public class Peao(bool eBranca) : IPeao
     {
         public bool VarificaPromocao(Tabuleiro tabuleiro)
         {
@@ -20,16 +20,9 @@
         /// <summary>
         /// Peca que o peão se transforma quando é promovido.
         /// </summary>
-        public Peao PecaPromocao { get; set; }
+        public IPeca PecaPromocao { get; set; }
 
-        /// <summary>
-        /// Indica se a peça é uma branca ou não.
-        /// </summary>
-        public Peao(bool eBranca)
-        : base(eBranca)
-        {
-        }
-
+        public bool EBranca { get; set; }
         /// <summary>
         /// Indica se a peça foi movimentada ou não.
         /// </summary>

@@ -1,36 +1,26 @@
 ﻿namespace Xadrez.Models.Pecas
 {
-    public class Torre : ITorre
+    public class Torre(bool eBranca) : Peca(eBranca)
     {
-        
-
-       
-        /// <summary>
-        /// Indica se a peça é uma branca ou não.
-        /// </summary>
-        public Torre(bool eBranca)
-        : base(eBranca)
-        {
-        }
-
-        /// <summary>
-        /// Indica se a peça foi movimentada ou não.
-        /// </summary>
-        public bool FoiMovimentada { set; get; }
 
         /// <summary>
         /// Devolve lista de movimentos possíveis para a peça.
         /// </summary>
         /// <param name="tabuleiro">O tabuleiro atual do jogo.</param>
         /// <returns>Uma lista de movimentos possíveis para a peça.</returns>
-        public List<Movimento> MovimentosPossiveis(Tabuleiro tabuleiro)
+        public override List<Movimento> MovimentosPossiveis(Tabuleiro tabuleiro)
         {
-            throw new NotImplementedException();
-        }
+            var movimentos = new List<Movimento>();
 
-        /// <summary>
-        /// Devolve o código da peça.
-        /// </summary>
-        public string Codigo { get; }
+            foreach (var casa in tabuleiro.Casas)
+            {
+                if (casa.Peca is null || casa.Peca.EBranca != this.EBranca)
+                {
+                    movimentos.Add(new Movimento(this, tabuleiro.ObtemCasaPeca(this), casa, casa.Peca));
+                }
+            }
+
+            return movimentos;
+        }
     }
 }
