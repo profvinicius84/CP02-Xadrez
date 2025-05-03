@@ -118,7 +118,47 @@ public class Tabuleiro : ITabuleiro
 
     public bool ValidaMovimento(Jogador jogador, Movimento movimento)
     {
-        throw new NotImplementedException();
+        if (movimento.Peca.EBranca != jogador.EBranco)
+            return false;
+
+        if (movimento.CasaOrigem.Peca != movimento.Peca)
+            return false;
+
+        if (movimento.CasaDestino.Peca != null && movimento.CasaDestino.Peca.EBranca == jogador.EBranco)
+            return false;
+
+        if (!movimento.Peca.MovimentosPossiveis(this).Any(m => m.CasaDestino == movimento.CasaDestino))
+            return false;
+
+        if (movimento.PecaCapturada != null && movimento.PecaCapturada != movimento.CasaDestino.Peca)
+            return false;
+
+        var origem = movimento.CasaOrigem;
+        var destino = movimento.CasaDestino;
+
+        var pecaOrigem = origem.Peca;
+        var pecaDestino = destino.Peca;
+
+        // Aplica o movimento no tabuleiro (temporariamente)
+        origem.Peca = null;
+        destino.Peca = pecaOrigem;
+
+        bool reiEmXeque = VerificaXeque(jogador.EBranco);
+
+        // Desfaz o movimento
+        origem.Peca = pecaOrigem;
+        destino.Peca = pecaDestino;
+
+        if (reiEmXeque)
+            return false;
+
+        if (movimento.ERoque && movimento.Peca is Rei rei)
+        {
+            if (!rei.VerificaRoque(this))
+                return false;
+        }
+
+        return true;
     }
 
     public void ExecutaMovimento(Movimento movimento)
@@ -138,15 +178,44 @@ public class Tabuleiro : ITabuleiro
 
     public bool VerificaXeque(bool eBranca)
     {
-        var rei = (eBranca ? PecasBrancas : PecasPretas).FirstOrDefault(p => p is IRei); //verifica se é branca ou preta e pega as peças certas
-        if (rei == null) return false; // caso não encontre o rei
+        // Seleciona as peças do jogador conforme a cor informada
+        var pecasDoJogador = eBranca ? PecasBrancas : PecasPretas;
 
-        var casaRei = ObtemCasaPeca(rei);
-        var inimigos = eBranca ? PecasPretas : PecasBrancas;
+        // Encontra o rei do jogador
+        IPeca? rei = pecasDoJogador.FirstOrDefault(p => p is IRei);
+        if (rei == null)
+        {
+            // Não encontrou o rei — talvez o jogo esteja em um estado inválido
+            return false;
+        }
 
-        return inimigos.Any(inimigo =>
-            inimigo.MovimentosPossiveis(this).Any(m => m.CasaDestino == casaRei)
-        );
+        // Encontra a casa onde está o rei
+        Casa? casaDoRei = ObtemCasaPeca(rei);
+        if (casaDoRei == null)
+        {
+            // O rei não está posicionado em nenhuma casa — também um estado inválido
+            return false;
+        }
+
+        // Seleciona as peças inimigas
+        var pecasInimigas = eBranca ? PecasPretas : PecasBrancas;
+
+        // Verifica se alguma peça inimiga pode capturar o rei
+        foreach (var pecaInimiga in pecasInimigas)
+        {
+            var movimentosInimigos = pecaInimiga.MovimentosPossiveis(this);
+            foreach (var movimento in movimentosInimigos)
+            {
+                if (movimento.CasaDestino == casaDoRei)
+                {
+                    // O rei está sob ameaça
+                    return true;
+                }
+            }
+        }
+
+        // Nenhuma peça inimiga ameaça o rei
+        return false;
     }
 
     public bool VerificaXequeMate(bool eBranca)
