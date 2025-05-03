@@ -58,6 +58,7 @@ public class Tabuleiro : ITabuleiro
         }
     }
 
+    //Feito
     public void DistribuiPecas()
     {
         Pecas.Clear();
@@ -115,7 +116,7 @@ public class Tabuleiro : ITabuleiro
         }
     }
     
-
+    //Feito
     public bool ValidaMovimento(Jogador jogador, Movimento movimento)
     {
         // Verificando se a peça que quer mexer é da mesma cor que o jogador
@@ -167,6 +168,7 @@ public class Tabuleiro : ITabuleiro
         return true;
     }
 
+    //Feito
     public void ExecutaMovimento(Movimento movimento)
     {
 
@@ -192,9 +194,10 @@ public class Tabuleiro : ITabuleiro
 
         origem.Peca = null;
         destino.Peca = pecaOrigem;
+        
 
 
-        if(movimento.Peca is Rei rei)
+        if (movimento.Peca is Rei rei)
         {
             if(!rei.FoiMovimentada && movimento.ERoque)
             {
@@ -210,7 +213,67 @@ public class Tabuleiro : ITabuleiro
 
     public void ReverteMovimento(Movimento movimento)
     {
-        throw new NotImplementedException();
+        var origem = movimento.CasaOrigem;
+        var destino = movimento.CasaDestino;
+
+        origem.Peca = movimento.Peca;
+        destino.Peca = movimento.PecaCapturada;
+        
+
+        if (movimento.PecaCapturada != null)
+        {
+            if (origem.Peca.EBranca)
+            {
+                PecasPretasCapturadas.Remove(movimento.PecaCapturada);
+                PecasPretas.Add(movimento.PecaCapturada);
+            }
+            else
+            {
+                PecasBrancasCapturadas.Remove(movimento.PecaCapturada);
+                PecasBrancas.Add(movimento.PecaCapturada);
+            }
+        }
+
+        // Se for um roque, execute a reversão do rei e torre
+        // Se o movimento for um roque, precisamos desfazer os movimentos do rei e torre
+        if (movimento.ERoque)
+        {
+            if (movimento.Peca is Rei rei)
+            {
+                // Verifique se foi roque pequeno ou grande, dependendo da posição do movimento
+                if (movimento.CasaOrigem.Codigo == "e1" && movimento.CasaDestino.Codigo == "c1") // Exemplo de roque grande (preto)
+                {
+                    // Restaurar a posição do rei
+                    var casaRei = ObtemCasaPeca(rei);
+                    var casaReiOriginal = ObtemCasaPeca(rei); // Coloque aqui a casa original do rei
+                    casaRei.Peca = null;
+                    casaReiOriginal.Peca = rei;
+
+                    // Restaurar a posição da torre
+                    var torre = movimento.CasaDestino.Peca as Torre;
+                    var casaTorre = ObtemCasaPeca(torre);
+                    var casaTorreOriginal = ObtemCasaPeca(torre); // Coloque aqui a casa original da torre
+                    casaTorre.Peca = null;
+                    casaTorreOriginal.Peca = torre;
+                }
+                else if (movimento.CasaOrigem.Codigo == "e1" && movimento.CasaDestino.Codigo == "g1") // Exemplo de roque pequeno (branco)
+                {
+                    // Restaurar a posição do rei
+                    var casaRei = ObtemCasaPeca(rei);
+                    var casaReiOriginal = ObtemCasaPeca(rei); // Coloque aqui a casa original do rei
+                    casaRei.Peca = null;
+                    casaReiOriginal.Peca = rei;
+
+                    // Restaurar a posição da torre
+                    var torre = movimento.CasaDestino.Peca as Torre;
+                    var casaTorre = ObtemCasaPeca(torre);
+                    var casaTorreOriginal = ObtemCasaPeca(torre); // Coloque aqui a casa original da torre
+                    casaTorre.Peca = null;
+                    casaTorreOriginal.Peca = torre;
+                }
+            }
+        }
+
     }
 
     public Casa? ObtemCasaPeca(IPeca peca)
