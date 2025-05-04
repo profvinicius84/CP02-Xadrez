@@ -77,7 +77,7 @@ namespace Xadrez.Models.Pecas
                 throw new InvalidOperationException("Torre não encontrada para o roque.");
 
             // Verificar se o rei ou a torre ainda estão nas casas originais
-            var casaReiInicial = tabuleiro.Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == 4); // 4 é a coluna inicial do rei
+            var casaReiInicial = tabuleiro.Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == 3); // 4 é a coluna inicial do rei
             var casaTorreInicial = tabuleiro.Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == (roquePequeno ? 7 : 0));
 
             bool reiMoveu = casaReiInicial?.Peca != this;
@@ -113,30 +113,38 @@ namespace Xadrez.Models.Pecas
 
             //foreach (var casa in tabuleiro.Casas)
             //{
-                int linha = casaRei.Linha;
-                int coluna = casaRei.Coluna;
+            int linha = casaRei.Linha;
+            int coluna = casaRei.Coluna;
 
-                var direcoes = new (int linha, int coluna)[]
+            var direcoes = new (int linha, int coluna)[]
+            {
+            (-1, 0),
+            (1, 0),
+            (0, -1),
+            (0, 1),
+            (-1, -1),
+            (-1, 1),
+            (1, -1),
+            (1, 1),
+            };
+
+            // Adcionado para atender a direção do roque
+            if ((linha == 0 || linha == 7) && coluna == 3)
+            {
+                var direcoesExtras = new (int, int)[]
                 {
-                (-1, 0),
-                (1, 0),
-                (0, -1),
-                (0, 1),
-                (-1, -1),
-                (-1, 1),
-                (1, -1),
-                (1, 1),
+                    (0, 4), // roque pequeno (rei vai para coluna 6)
+                    (0, -3) // roque grande (rei vai para coluna 2)
                 };
 
-                // Adcionado para atender a direção do roque
-                if (linha == 0 && coluna == 4)
+                Array.Resize(ref direcoes, direcoes.Length + direcoesExtras.Length);
+                for (int i = 0; i < direcoesExtras.Length; i++)
                 {
-                    var novaDirecao = (0, 3);
-                    Array.Resize(ref direcoes, direcoes.Length + 1);
-                    direcoes[^1] = novaDirecao;
+                    direcoes[^(direcoesExtras.Length - i)] = direcoesExtras[i];
                 }
+            }
 
-                foreach (var (dLinha, dColuna) in direcoes)
+            foreach (var (dLinha, dColuna) in direcoes)
                 {
                     int novaLinha = linha + dLinha;
                     int novaColuna = coluna + dColuna;
