@@ -1,6 +1,7 @@
 ﻿using Xadrez.Models.Pecas;
 using System.Linq; // Adicionado para FirstOrDefault() e Any()
 namespace Xadrez.Models;
+using System;
 
 /// <summary>
 /// Representa o tabuleiro de xadrez.
@@ -57,9 +58,86 @@ public class Tabuleiro : ITabuleiro
         }
     }
 
+    // Método para distribuir as peças na posição inicial
     public void DistribuiPecas()
     {
-        throw new NotImplementedException();
+        // 1. Limpar tabuleiro e listas (opcional, mas recomendado)
+        foreach (var casa in Casas)
+        {
+            casa.Peca = null;
+        }
+        Pecas.Clear();
+        PecasCapturadas.Clear();
+
+        // 2. Adicionar Peças Brancas (linha 0 e 1)
+        // Peças não criadas pelo meu grupo comentadas
+
+        // Linha 0 (Traseira)
+        //AdicionarPeca(new Torre(true), 0, 0); // A1
+        AdicionarPeca(new Cavalo(true), 0, 1); // B1
+        //AdicionarPeca(new Bispo(true), 0, 2); // C1
+        //AdicionarPeca(new Rainha(true), 0, 3); // D1
+        //AdicionarPeca(new Rei(true), 0, 4); // E1
+        //AdicionarPeca(new Bispo(true), 0, 5); // F1
+        AdicionarPeca(new Cavalo(true), 0, 6); // G1
+        //AdicionarPeca(new Torre(true), 0, 7); // H1
+
+        // Linha 1 (Peões)
+        //for (int col = 0; col < 8; col++)
+        //{
+        //    AdicionarPeca(new Peao(true), 1, col); // A2 a H2
+        //}
+
+        // 3. Adicionar Peças Pretas (linha 6 e 7)
+        // Linha 7 (Traseira)
+        //AdicionarPeca(new Torre(false), 7, 0); // A8
+        AdicionarPeca(new Cavalo(false), 7, 1); // B8
+        //AdicionarPeca(new Bispo(false), 7, 2); // C8
+        //AdicionarPeca(new Rainha(false), 7, 3); // D8
+        //AdicionarPeca(new Rei(false), 7, 4); // E8
+        //AdicionarPeca(new Bispo(false), 7, 5); // F8
+        AdicionarPeca(new Cavalo(false), 7, 6); // G8
+        //AdicionarPeca(new Torre(false), 7, 7); // H8
+
+        // Linha 6 (Peões)
+        //for (int col = 0; col < 8; col++)
+        //{
+        //    AdicionarPeca(new Peao(false), 6, col); // A7 a H7
+        //}
+
+        // 4. Garante que o estado FoiMovimentada está false para todas no início
+        foreach (var peca in Pecas)
+        {
+            peca.FoiMovimentada = false;
+        }
+    }
+
+    // Método auxiliar privado para adicionar peças usando linha e coluna
+    private void AdicionarPeca(IPeca peca, int linha, int coluna)
+    {
+        // Encontra a casa correspondente na lista Casas usando LINQ
+        // Assume que a lista Casas foi populada corretamente (0,0), (0,1), ..., (7,7)
+        Casa casa = Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == coluna);
+
+        if (casa != null)
+        {
+            // Verifica se a casa já está ocupada (não deveria acontecer em DistribuirPecas)
+            if (casa.Peca != null)
+            {
+                Console.WriteLine($"Aviso: Tentando adicionar peça em casa já ocupada: ({linha},{coluna})");
+            }
+            // Coloca a peça na casa encontrada
+            casa.Peca = peca;
+            // Adiciona a peça à lista geral de peças do tabuleiro
+            Pecas.Add(peca);
+        }
+        else
+        {
+            // Isso indica um problema na inicialização da lista Casas ou nos índices fornecidos
+            Console.WriteLine($"Erro: Casa não encontrada para os índices: ({linha},{coluna})");
+            // Considerar lançar uma exceção aqui em um cenário real
+            // throw new InvalidOperationException($"Casa não encontrada para ({linha},{coluna})");
+        }
     }
 
     public bool ValidaMovimento(Jogador jogador, Movimento movimento)
