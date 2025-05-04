@@ -245,7 +245,7 @@ public class Tabuleiro : ITabuleiro
         // Implementação de exceções específicas (como roque) será abordada em aula
     }
 
-    //Ja havia sido implementado?
+    //Feito
     public Casa? ObtemCasaPeca(IPeca peca)
     {
         return Casas.FirstOrDefault(c => c.Peca == peca);
