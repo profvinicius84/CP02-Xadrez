@@ -1,4 +1,5 @@
-﻿using Xadrez.Models.Pecas;
+﻿using System.Data.Common;
+using Xadrez.Models.Pecas;
 
 namespace Xadrez.Models;
 
@@ -59,22 +60,100 @@ public class Tabuleiro : ITabuleiro
 
     public void DistribuiPecas()
     {
-        throw new NotImplementedException();
+        // Adicionando peças brancos
+        AdicionarPecas(true);
+
+        // Adicionando peças pretas
+        AdicionarPecas(false);
+    }
+
+    public void AdicionarPecas(Boolean eBraca)
+    {
+        // Adicionando peões brancos
+        for (int coluna = 0; coluna < 8; coluna++)
+        {
+            this.Casas.Find(casa => casa.Linha == 1 && casa.Coluna == coluna).Peca = new Peao(eBraca);
+        }
+
+        // Adicionando demais peças brancas
+        for (int coluna = 0; coluna < 8; coluna++)
+        {
+            if (coluna == 0 || coluna == 7)
+            {
+                this.Casas.Find(casa => casa.Linha == 0 && casa.Coluna == coluna).Peca = new Torre(eBraca);
+            }
+            else if (coluna == 1 || coluna == 6)
+            {
+                this.Casas.Find(casa => casa.Linha == 0 && casa.Coluna == coluna).Peca = new Cavalo(eBraca);
+            }
+            else if (coluna == 2 || coluna == 5)
+            {
+                this.Casas.Find(casa => casa.Linha == 0 && casa.Coluna == coluna).Peca = new Bispo(eBraca);
+            }
+            else if (coluna == 3)
+            {
+                this.Casas.Find(casa => casa.Linha == 0 && casa.Coluna == coluna).Peca = new Rainha(eBraca);
+            }
+            else
+            {
+                this.Casas.Find(casa => casa.Linha == 0 && casa.Coluna == coluna).Peca = new Rei(eBraca);
+            }
+        }
     }
 
     public bool ValidaMovimento(Jogador jogador, Movimento movimento)
     {
-        throw new NotImplementedException();
+        bool eCasaDestinoLinha = movimento.CasaDestino.Linha >= 0 && movimento.CasaDestino.Linha < 8;
+        bool eCasaDestinoColuna = movimento.CasaDestino.Coluna >= 0 && movimento.CasaDestino.Coluna < 8;
+        bool eCasaOrigemLinha = movimento.CasaOrigem.Linha >= 0 && movimento.CasaOrigem.Linha < 8;
+        bool eCasaOrigemColuna = movimento.CasaOrigem.Coluna >= 0 && movimento.CasaOrigem.Coluna < 8;
+        bool eMovimentoPossivel = movimento.Peca.MovimentosPossiveis(this).Contains(movimento);
+
+        if (eCasaDestinoLinha && eCasaDestinoColuna && eCasaOrigemLinha && eCasaOrigemColuna && eMovimentoPossivel) {
+            IPeca? pecaCapturada = movimento.PecaCapturada;
+            IPeca? pecaCasaDestino = movimento.CasaDestino.Peca;
+            if (pecaCapturada != null && pecaCasaDestino != null)
+            {
+                if(pecaCapturada.EBranca != pecaCasaDestino.EBranca)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     public void ExecutaMovimento(Movimento movimento)
     {
-        throw new NotImplementedException();
+        Casa? casaDestino = Casas.Find(casa => casa.Linha == movimento.CasaDestino.Linha && casa.Coluna == movimento.CasaDestino.Coluna);
+        if (casaDestino != null )
+        {
+            IPeca pecaMorta = casaDestino.Peca;
+            IPeca pecaAssasina = movimento.PecaCapturada;
+            if (pecaMorta == pecaAssasina) 
+            {
+                if(pecaMorta.EBranca)
+                {
+                    this.PecasBrancasCapturadas.Add(pecaMorta);
+                }
+                else
+                {
+                    this.PecasPretasCapturadas.Add(pecaMorta);
+                }
+            }
+            casaDestino.Peca = movimento.Peca;
+            movimento.CasaOrigem.Peca = null;
+        }
     }
 
     public void ReverteMovimento(Movimento movimento)
     {
-        throw new NotImplementedException();
+        ExecutaMovimento(new Movimento(movimento.Peca, movimento.CasaDestino, movimento.CasaOrigem, movimento.PecaCapturada, movimento.ERoque));
     }
 
     public Casa? ObtemCasaPeca(IPeca peca)
