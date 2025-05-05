@@ -338,16 +338,125 @@ public class Tabuleiro : ITabuleiro
         // Verifica se alguma peça adversária pode se mover para a casa em questão
         foreach (var pecaAdversaria in pecasAdversarias)
         {
-            var movimentosPossiveis = pecaAdversaria.MovimentosPossiveis(this);
-
-            // Cria uma cópia da lista para evitar modificação durante a iteração
-            foreach (var movimento in movimentosPossiveis.ToList())
-            {
-                if (movimento.CasaDestino == casa)
-                    return true;
-            }
+            // Verifica de acordo com o tipo de peça para evitar recursão infinita
+            if (VerificaAtaquePeca(pecaAdversaria, casa))
+                return true;
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Verifica se uma peça pode atacar uma determinada casa, baseado no tipo de peça e sua posição.
+    /// </summary>
+    /// <param name="peca">A peça a ser verificada.</param>
+    /// <param name="casaAlvo">A casa alvo que pode estar sob ataque.</param>
+    /// <returns>Retorna verdadeiro se a peça pode atacar a casa, caso contrário, retorna falso.</returns>
+    private bool VerificaAtaquePeca(IPeca peca, Casa casaAlvo)
+    {
+        var casaPeca = ObtemCasaPeca(peca);
+        if (casaPeca == null)
+            return false;
+
+        // Verificação para evitar loop infinito quando chamado de dentro do MovimentosPossiveis do Rei
+        // Se estamos verificando a casa de uma peça adversária, não há ataque
+        if (casaPeca == casaAlvo)
+            return false;
+
+        // Lógica específica para cada tipo de peça
+        if (peca is Hades)
+        {
+            // Hades pode atacar qualquer casa
+            return true;
+        }
+        else if (peca is IRei)
+        {
+            // Rei pode atacar casas adjacentes (1 casa em qualquer direção)
+            int difLinha = Math.Abs(casaPeca.Linha - casaAlvo.Linha);
+            int difColuna = Math.Abs(casaPeca.Coluna - casaAlvo.Coluna);
+            return difLinha <= 1 && difColuna <= 1 && (difLinha > 0 || difColuna > 0);
+        }
+        else if (peca is ITorre)
+        {
+            // Torre pode atacar em linhas retas (horizontal e vertical)
+            if (casaPeca.Linha == casaAlvo.Linha || casaPeca.Coluna == casaAlvo.Coluna)
+            {
+                // Verifica se há peças no caminho
+                return CaminhoLivre(casaPeca, casaAlvo);
+            }
+            return false;
+        }
+        else if (peca is IBispo)
+        {
+            // Bispo pode atacar na diagonal
+            int difLinha = Math.Abs(casaPeca.Linha - casaAlvo.Linha);
+            int difColuna = Math.Abs(casaPeca.Coluna - casaAlvo.Coluna);
+            if (difLinha == difColuna)
+            {
+                // Verifica se há peças no caminho
+                return CaminhoLivre(casaPeca, casaAlvo);
+            }
+            return false;
+        }
+        else if (peca is IRainha)
+        {
+            // Rainha pode atacar em qualquer direção (horizontal, vertical e diagonal)
+            int difLinha = Math.Abs(casaPeca.Linha - casaAlvo.Linha);
+            int difColuna = Math.Abs(casaPeca.Coluna - casaAlvo.Coluna);
+            if (casaPeca.Linha == casaAlvo.Linha || casaPeca.Coluna == casaAlvo.Coluna || difLinha == difColuna)
+            {
+                // Verifica se há peças no caminho
+                return CaminhoLivre(casaPeca, casaAlvo);
+            }
+            return false;
+        }
+        else if (peca is ICavalo)
+        {
+            // Cavalo pode atacar em L (2 casas em uma direção e 1 casa na outra)
+            int difLinha = Math.Abs(casaPeca.Linha - casaAlvo.Linha);
+            int difColuna = Math.Abs(casaPeca.Coluna - casaAlvo.Coluna);
+            return (difLinha == 2 && difColuna == 1) || (difLinha == 1 && difColuna == 2);
+        }
+        else if (peca is IPeao)
+        {
+            // Peão pode atacar na diagonal à frente
+            int direcao = peca.EBranca ? 1 : -1;
+            return (casaAlvo.Linha == casaPeca.Linha + direcao) && 
+                   (casaAlvo.Coluna == casaPeca.Coluna - 1 || casaAlvo.Coluna == casaPeca.Coluna + 1);
+        }
+
+        // Se não é nenhum dos tipos específicos, verifica através dos movimentos possíveis
+        var movimentosPossiveis = peca.MovimentosPossiveis(this);
+        return movimentosPossiveis.Any(m => m.CasaDestino == casaAlvo);
+    }
+
+    /// <summary>
+    /// Verifica se o caminho entre duas casas está livre de peças.
+    /// </summary>
+    /// <param name="origem">Casa de origem.</param>
+    /// <param name="destino">Casa de destino.</param>
+    /// <returns>Retorna verdadeiro se o caminho está livre, caso contrário, retorna falso.</returns>
+    private bool CaminhoLivre(Casa origem, Casa destino)
+    {
+        int difLinha = destino.Linha - origem.Linha;
+        int difColuna = destino.Coluna - origem.Coluna;
+        
+        int passoLinha = difLinha == 0 ? 0 : difLinha / Math.Abs(difLinha);
+        int passoColuna = difColuna == 0 ? 0 : difColuna / Math.Abs(difColuna);
+        
+        int linhaAtual = origem.Linha + passoLinha;
+        int colunaAtual = origem.Coluna + passoColuna;
+        
+        while (linhaAtual != destino.Linha || colunaAtual != destino.Coluna)
+        {
+            var casaAtual = Casas.First(c => c.Linha == linhaAtual && c.Coluna == colunaAtual);
+            if (casaAtual.Peca != null)
+                return false;
+            
+            linhaAtual += passoLinha;
+            colunaAtual += passoColuna;
+        }
+        
+        return true;
     }
 }

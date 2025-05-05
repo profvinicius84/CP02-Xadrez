@@ -26,7 +26,7 @@ public class Rei(bool eBranca) : Peca(eBranca), IRei
         if (casaAtual == null)
             return movimentos;
 
-        // Direções possíveis para o Rei se mover: horizontais, verticais e diagonais (1 casa em cada direção)
+        // Movimentos possíveis: 1 casa em qualquer direção
         int[] direcaoLinha = { -1, -1, -1, 0, 0, 1, 1, 1 };
         int[] direcaoColuna = { -1, 0, 1, -1, 1, -1, 0, 1 };
 
@@ -35,15 +35,15 @@ public class Rei(bool eBranca) : Peca(eBranca), IRei
             int novaLinha = casaAtual.Linha + direcaoLinha[i];
             int novaColuna = casaAtual.Coluna + direcaoColuna[i];
 
-            // Verifica se a posição está dentro do tabuleiro
+            // Verifica se está dentro do tabuleiro
             if (novaLinha >= 0 && novaLinha < 8 && novaColuna >= 0 && novaColuna < 8)
             {
                 Casa casaDestino = tabuleiro.Casas.First(c => c.Linha == novaLinha && c.Coluna == novaColuna);
 
-                // Verifica se a casa destino está vazia ou tem uma peça adversária
+                // Verifica se pode mover para a casa
                 if (casaDestino.Peca == null || casaDestino.Peca.EBranca != this.EBranca)
                 {
-                    // Verifica se o movimento não colocaria o rei em xeque
+                    // Verifica se não está em xeque
                     if (!tabuleiro.VerificaPerigo(casaDestino, this.EBranca))
                     {
                         movimentos.Add(new Movimento(this, casaAtual, casaDestino, casaDestino.Peca));
@@ -52,19 +52,16 @@ public class Rei(bool eBranca) : Peca(eBranca), IRei
             }
         }
 
-        // Verifica possibilidade de roque
-        // Implementar lógica do roque pequeno
+        // Verifica roque pequeno
         if (VerificaRoque(tabuleiro, true))
         {
-            // Adiciona movimento de roque pequeno
             Casa casaDestinoRei = tabuleiro.Casas.First(c => c.Linha == casaAtual.Linha && c.Coluna == casaAtual.Coluna + 2);
             movimentos.Add(new Movimento(this, casaAtual, casaDestinoRei, null, true));
         }
 
-        // Implementar lógica do roque grande
+        // Verifica roque grande
         if (VerificaRoque(tabuleiro, false))
         {
-            // Adiciona movimento de roque grande
             Casa casaDestinoRei = tabuleiro.Casas.First(c => c.Linha == casaAtual.Linha && c.Coluna == casaAtual.Coluna - 2);
             movimentos.Add(new Movimento(this, casaAtual, casaDestinoRei, null, true));
         }
@@ -80,11 +77,11 @@ public class Rei(bool eBranca) : Peca(eBranca), IRei
     /// <returns>Retorna verdadeiro se o roque é possível, caso contrário, retorna falso.</returns>
     public bool VerificaRoque(Tabuleiro tabuleiro, bool roquePequeno = false)
     {
-        // Se o rei já foi movido, não pode fazer roque
+        // Rei não pode ter se movido
         if (this.FoiMovimentada)
             return false;
 
-        // Se o rei está em xeque, não pode fazer roque
+        // Rei não pode estar em xeque
         if (this.EmCheque)
             return false;
 
@@ -92,31 +89,29 @@ public class Rei(bool eBranca) : Peca(eBranca), IRei
         if (casaRei == null)
             return false;
 
-        // Verificar se a torre está na posição correta e não foi movida
-        int colunaTorre = roquePequeno ? 7 : 0; // Coluna 7 para roque pequeno, coluna 0 para roque grande
+        // Verifica torre
+        int colunaTorre = roquePequeno ? 7 : 0;
         var casaTorre = tabuleiro.Casas.FirstOrDefault(c => c.Linha == casaRei.Linha && c.Coluna == colunaTorre);
 
         if (casaTorre?.Peca is not ITorre torre || torre.EBranca != this.EBranca || torre.FoiMovimentada)
             return false;
 
-        // Verifica se o caminho entre o rei e a torre está livre
+        // Verifica caminho livre
         int direcao = roquePequeno ? 1 : -1;
-        int distancia = roquePequeno ? 2 : 3; // Distância a verificar (2 para roque pequeno, 3 para roque grande)
+        int distancia = roquePequeno ? 2 : 3;
 
         for (int i = 1; i <= distancia; i++)
         {
             int colunaVerificar = casaRei.Coluna + (i * direcao);
             var casaVerificar = tabuleiro.Casas.First(c => c.Linha == casaRei.Linha && c.Coluna == colunaVerificar);
 
-            // Verifica se há peças no caminho (exceto a torre no final)
             if (i < distancia || (!roquePequeno && i == distancia))
             {
                 if (casaVerificar.Peca != null)
                     return false;
             }
 
-            // Verifica se as casas por onde o rei passa não estão sob ataque
-            if (i <= 2) // O rei só passa por 2 casas no máximo (sua posição original + 2)
+            if (i <= 2)
             {
                 if (tabuleiro.VerificaPerigo(casaVerificar, this.EBranca))
                     return false;
@@ -138,7 +133,7 @@ public class Rei(bool eBranca) : Peca(eBranca), IRei
         if (casaRei == null)
             throw new InvalidOperationException("Rei não encontrado no tabuleiro");
 
-        // Determina as posições da torre
+        // Posições da torre
         int colunaTorreOrigem = roquePequeno ? 7 : 0;
         int colunaTorreDestino = roquePequeno ? 5 : 3;
 
@@ -148,19 +143,19 @@ public class Rei(bool eBranca) : Peca(eBranca), IRei
         if (casaTorreOrigem.Peca is not ITorre torre)
             throw new InvalidOperationException("Torre não encontrada para executar o roque");
 
-        // Determina as posições do rei
+        // Posições do rei
         int colunaReiDestino = roquePequeno ? casaRei.Coluna + 2 : casaRei.Coluna - 2;
         var casaReiDestino = tabuleiro.Casas.First(c => c.Linha == casaRei.Linha && c.Coluna == colunaReiDestino);
 
-        // Cria o movimento de roque
+        // Cria movimento
         var movimentoRoque = new Movimento(this, casaRei, casaReiDestino, null, true);
 
-        // Move o rei
+        // Move rei
         casaRei.Peca = null;
         casaReiDestino.Peca = this;
         this.FoiMovimentada = true;
 
-        // Move a torre
+        // Move torre
         casaTorreOrigem.Peca = null;
         casaTorreDestino.Peca = torre;
         torre.FoiMovimentada = true;
