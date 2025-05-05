@@ -62,6 +62,12 @@ public class Partida<TTabuleiro> where TTabuleiro : ITabuleiro, new()
             var casa = (Tabuleiro as Tabuleiro).Casas[i - 1];
             casa.Peca = new Hades(false);
         }
+
+        // Rainha branca na casa d1 (índice 3)
+        (Tabuleiro as Tabuleiro).Casas[3].Peca = new Rainha(true);
+
+        // Rainha preta na casa d8 (índice 59)
+        (Tabuleiro as Tabuleiro).Casas[59].Peca = new Rainha(false);
         #endregion
     }
 }
