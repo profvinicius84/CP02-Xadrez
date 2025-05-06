@@ -63,5 +63,8 @@ public class Partida<TTabuleiro> where TTabuleiro : ITabuleiro, new()
             casa.Peca = new Hades(false);
         }
         #endregion
+
+        // Para rodar o código comentar region acima e descomentar o método DistribuiPecas abaixo
+        //Tabuleiro.DistribuiPecas();
     }
 }
