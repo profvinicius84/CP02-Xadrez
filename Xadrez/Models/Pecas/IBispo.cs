@@ -1,6 +1,6 @@
-﻿using Xadrez.Tabuleiro;
+using Xadrez.Tabuleiro;
  
-namespace Xadrez.Pecas
+namespace Xadrez.Models.Pecas;
 {
     public class Bispo : Peca
     {
@@ -10,7 +10,7 @@ namespace Xadrez.Pecas
         {
             bool[,] matriz = new bool[Tabuleiro.Linhas, Tabuleiro.Colunas];
  
-            Posicao pos = new Posicao(0, 0);
+            Posicao pos = new Posicao(0, 0); // Posição inicial do bispo
  
             // Direção: Noroeste
             pos.DefinirValores(Posicao.Linha - 1, Posicao.Coluna - 1);
@@ -18,7 +18,7 @@ namespace Xadrez.Pecas
             {
                 matriz[pos.Linha, pos.Coluna] = true;
                 if (Tabuleiro.Peca(pos) != null && Tabuleiro.Peca(pos).Cor != Cor)
-                    break;
+                    break;  // O bispo pode capturar a peça adversária, mas não pode passar por ela
                 pos.DefinirValores(pos.Linha - 1, pos.Coluna - 1);
             }
  
