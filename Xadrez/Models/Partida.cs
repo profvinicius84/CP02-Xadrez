@@ -50,20 +50,23 @@ public class Partida<TTabuleiro> where TTabuleiro : ITabuleiro, new()
 
         #region Tabuleiro.DistribuiPecas();
         //Peças brancas
-        for (int i = 0; i < 16; i++)
-        {
-            var casa = (Tabuleiro as Tabuleiro).Casas[i];
-            //casa.Peca = new Hades(true);
-            casa.Peca = new Rei(true);
-        }
+        //for (int i = 0; i < 16; i++)
+        //{
+        //    var casa = (Tabuleiro as Tabuleiro).Casas[i];
+        //    //casa.Peca = new Hades(true);
+        //    casa.Peca = new Rei(true);
+        //}
 
         //Peças pretas
-        for (int i = (Tabuleiro as Tabuleiro).Casas.Count; i > (Tabuleiro as Tabuleiro).Casas.Count - 16; i--)
-        {
-            var casa = (Tabuleiro as Tabuleiro).Casas[i - 1];
-            //casa.Peca = new Hades(false);
-            casa.Peca = new Rei(false);
-        }
+        //for (int i = (Tabuleiro as Tabuleiro).Casas.Count; i > (Tabuleiro as Tabuleiro).Casas.Count - 16; i--)
+        //{
+        //    var casa = (Tabuleiro as Tabuleiro).Casas[i - 1];
+        //    //casa.Peca = new Hades(false);
+        //    casa.Peca = new Rei(false);
+        //}
+
+        Tabuleiro.DistribuiPecas();
+
         #endregion
     }
 }

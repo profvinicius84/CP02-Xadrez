@@ -19,45 +19,45 @@ namespace Xadrez.Models.Pecas
 
         public bool VerificaRoque(Tabuleiro tabuleiro, bool roquePequeno = false)
         {
-            if (RoqueExecutado)
-                throw new InvalidOperationException("O roque já foi executado e não pode ser feito novamente.");
+            //if (RoqueExecutado)
+            //    throw new InvalidOperationException("O roque já foi executado e não pode ser feito novamente.");
 
-            if (tabuleiro.VerificaXeque(EBranca))
-                return false;
+            ////if (tabuleiro.VerificaXeque(EBranca))
+            ////    return false;
 
-            var casaRei = tabuleiro.ObtemCasaPeca(this);
-            if (casaRei == null) return false;
+            //var casaRei = tabuleiro.ObtemCasaPeca(this);
+            //if (casaRei == null) return false;
 
-            int linha = casaRei.Linha;
-            int colunaRei = casaRei.Coluna;
-            int colunaTorre = roquePequeno ? 7 : 0;
+            //int linha = casaRei.Linha;
+            //int colunaRei = casaRei.Coluna;
+            //int colunaTorre = roquePequeno ? 7 : 0;
 
-            var casaTorre = tabuleiro.Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == colunaTorre);
-            if (casaTorre?.Peca is not ITorre torre || torre.EBranca != EBranca)
-                return false;
+            //var casaTorre = tabuleiro.Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == colunaTorre);
+            //if (casaTorre?.Peca is not ITorre torre || torre.EBranca != EBranca)
+            //    return false;
 
-            // Verificar se rei ou torre ainda estão em suas casas originais
-            var casaReiInicial = tabuleiro.Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == 4); 
-            var casaTorreInicial = casaTorre; 
+            //// Verificar se rei ou torre ainda estão em suas casas originais
+            //var casaReiInicial = tabuleiro.Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == 3); 
+            //var casaTorreInicial = casaTorre; 
 
-            bool reiMoveu = casaReiInicial?.Peca != this;
-            bool torreMoveu = casaTorreInicial?.Peca != torre;
+            //bool reiMoveu = casaReiInicial?.Peca != this;
+            //bool torreMoveu = casaTorreInicial?.Peca != torre;
 
-            if (reiMoveu || torreMoveu)
-                return false;
+            //if (reiMoveu || torreMoveu)
+            //    return false;
 
-            int direcao = roquePequeno ? 1 : -1;
-            int inicio = colunaRei + direcao;
-            int fim = roquePequeno ? 6 : 1;
+            //int direcao = roquePequeno ? 1 : -1;
+            //int inicio = colunaRei + direcao;
+            //int fim = roquePequeno ? 6 : 1;
 
-            for (int col = inicio; roquePequeno ? col <= fim : col >= fim; col += direcao)
-            {
-                var casa = tabuleiro.Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == col);
-                if (casa?.Peca != null)
-                    return false;
+            //for (int col = inicio; roquePequeno ? col <= fim : col >= fim; col += direcao)
+            //{
+            //    var casa = tabuleiro.Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == col);
+            //    if (casa?.Peca != null)
+            //        return false;
 
-                // Se tiver um método para verificar se o rei estaria em xeque ao passar por essa casa, use aqui
-            }
+            //    // Se tiver um método para verificar se o rei estaria em xeque ao passar por essa casa, use aqui
+            //}
 
             return true;
         }
@@ -131,10 +131,11 @@ namespace Xadrez.Models.Pecas
             // Adcionado para atender a direção do roque
             if ((linha == 0 || linha == 7) && coluna == 3)
             {
+
                 var direcoesExtras = new (int, int)[]
                 {
-                    (0, 4), // roque pequeno (rei vai para coluna 6)
-                    (0, -3) // roque grande (rei vai para coluna 2)
+                    (0, 3), // roque pequeno (rei vai para coluna 6)
+                    (0, -2) // roque grande (rei vai para coluna 2)
                 };
 
                 Array.Resize(ref direcoes, direcoes.Length + direcoesExtras.Length);
@@ -145,37 +146,95 @@ namespace Xadrez.Models.Pecas
             }
 
             foreach (var (dLinha, dColuna) in direcoes)
+            {
+                int novaLinha = linha + dLinha;
+                int novaColuna = coluna + dColuna;
+
+                if (novaLinha >= 0 && novaLinha < 8 && novaColuna >= 0 && novaColuna < 8)
                 {
-                    int novaLinha = linha + dLinha;
-                    int novaColuna = coluna + dColuna;
+                    var casaDestino = tabuleiro.Casas.FirstOrDefault(c => c.Linha == novaLinha && c.Coluna == novaColuna);
 
-                    if (novaLinha >= 0 && novaLinha < 8 && novaColuna >= 0 && novaColuna < 8)
+                    if (casaDestino?.Peca == null || casaDestino.Peca.EBranca != EBranca)
                     {
-                        var casaDestino = tabuleiro.Casas.FirstOrDefault(c => c.Linha == novaLinha && c.Coluna == novaColuna);
-
-                        //if (casaDestino?.Peca == null || casaDestino.Peca.EBranca != EBranca)
-                        //{
                         //if (!tabuleiro.VerificaXeque(true))
                         //{
-                        movimentos.Add(new Movimento(this, casaRei, casaDestino));
+                        //movimentos.Add(new Movimento(this, casaRei, casaDestino));
                         //}
-                        //}
+
+                        if (IsRoque(casaDestino))
+                        {
+                            //if (VerificaRoque(tabuleiro, false))
+                            //{
+                            var movimentoRoque = new Movimento(this, casaRei, casaDestino, null, true);
+
+                            var bloqueado = false;
+
+                            if (casaDestino.Linha == 0 && casaDestino.Coluna == 1) // Roque Pequeno
+                            { 
+                                var casa = tabuleiro.Casas.FirstOrDefault(c => c.Linha == 0 && c.Coluna == 2);
+
+                                if (casa?.Peca != null)
+                                {
+                                    bloqueado = true;
+                                }
+
+                                if (!bloqueado && casaDestino?.Peca == null)
+                                {
+                                    movimentos.Add(movimentoRoque);
+                                }
+                            }
+                            else if (casaDestino.Linha == 0 && casaDestino.Coluna == 6) // Roque Grande
+                            {
+                                var l = 0;
+                                for (int col = 4; col < 6; col++)
+                                {
+                                    var casa = tabuleiro.Casas.FirstOrDefault(c => c.Linha == l && c.Coluna == col);
+                                    if (casa?.Peca != null)
+                                    {
+                                        bloqueado = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!bloqueado && casaDestino?.Peca == null)
+                                {
+                                    movimentos.Add(movimentoRoque);
+                                }
+                            }
+                            else
+                            {
+                                movimentos.Add(new Movimento(this, casaRei, casaDestino));
+                            }
+                            //}
+                        } else {
+                            //if (!tabuleiro.VerificaXeque(true))
+                            //{
+                            movimentos.Add(new Movimento(this, casaRei, casaDestino));
+                            //}
+                        }
                     }
                 }
+            }
             //}
 
             return movimentos;
         }
 
-        public class MovimentoDuplo : Movimento
+        public bool IsRoque(Casa casaDestino)
         {
-            public Movimento MovimentoTorre { get; }
-
-            public MovimentoDuplo(Movimento movimentoRei, Movimento movimentoTorre)
-                : base(movimentoRei.Peca, movimentoRei.CasaOrigem, movimentoRei.CasaDestino)
+            if (casaDestino.Linha == 0) // Peça Branca
             {
-                MovimentoTorre = movimentoTorre;
+                if (casaDestino.Coluna == 1) // Roque Pequeno
+                {
+                    return true;
+                } 
+                else if (casaDestino.Coluna == 6) // Roque Grande
+                {
+                    return true;
+                }
             }
+
+            return false;
         }
     }
 }

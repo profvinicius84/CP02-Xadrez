@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Xadrez.Models;
+using Xadrez.Models.Pecas;
 
 namespace Xadrez.Components.Shared;
 
@@ -56,15 +57,41 @@ public partial class PainelTabuleiro
             var movimento = MovimentosPossiveisPecaSelecionada.First(m => m.CasaDestino == casa);
 
             #region Partida.Tabuleiro.ExecutaMovimento(movimento);
+
             if (movimento.CasaDestino.Peca is not null)
                 Partida.Tabuleiro.PecasCapturadas.Add(movimento.CasaDestino.Peca);
-            movimento.CasaOrigem.Peca = null;
-            movimento.CasaDestino.Peca = movimento.Peca;
-            movimento.Peca.FoiMovimentada = true;
-            PecaSelecionada = null;
-            MovimentosPossiveisPecaSelecionada.Clear();
-            Partida.Movimentos.Push(movimento);
-            AoMudarEstado.InvokeAsync();
+
+            if (Partida.Tabuleiro.ValidaMovimento(Partida.JogadorDaVez, movimento))
+            {
+                if (movimento.ERoque)
+                {
+                    movimento.CasaOrigem.Peca = null;
+                    movimento.CasaDestino.Peca = movimento.Peca;
+                    
+                    var torreColuna = movimento.CasaDestino.Coluna + 1;
+                    var torreCasa = new Casa(movimento.CasaDestino.Linha, torreColuna);
+                    var peca = Partida.Tabuleiro.Pecas.Find(p => p.Codigo == "T");
+                    var mov = new Movimento(peca, (Casa)torreCasa.Peca, (Casa)movimento.CasaOrigem.Peca);
+                    Partida.Movimentos.Push(mov);
+
+                    movimento.Peca.FoiMovimentada = true;
+                    PecaSelecionada = null;
+                    MovimentosPossiveisPecaSelecionada.Clear();
+                    Partida.Movimentos.Push(movimento);
+                    AoMudarEstado.InvokeAsync();
+                }
+                else
+                {
+                    movimento.CasaOrigem.Peca = null;
+                    movimento.CasaDestino.Peca = movimento.Peca;
+                    movimento.Peca.FoiMovimentada = true;
+                    PecaSelecionada = null;
+                    MovimentosPossiveisPecaSelecionada.Clear();
+                    Partida.Movimentos.Push(movimento);
+                    AoMudarEstado.InvokeAsync();
+                }
+            }
+
             #endregion
         }
         AtualizaCondicaoDisponibilidadeCasas();
