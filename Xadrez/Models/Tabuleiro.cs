@@ -102,6 +102,8 @@ public class Tabuleiro : ITabuleiro
             if (!possiveis.Any(m => m.CasaOrigem == movimento.CasaOrigem && m.CasaDestino == movimento.CasaDestino))
                 return false;
 
+            ExecutaMovimento(movimento);
+            ReverteMovimento(movimento);
             return true;
         }
 
