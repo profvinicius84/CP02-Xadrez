@@ -65,19 +65,51 @@ public partial class PainelTabuleiro
             {
                 if (movimento.ERoque)
                 {
+                    // Move o rei
                     movimento.CasaOrigem.Peca = null;
                     movimento.CasaDestino.Peca = movimento.Peca;
-                    
-                    var torreColuna = movimento.CasaDestino.Coluna + 1;
-                    var torreCasa = new Casa(movimento.CasaDestino.Linha, torreColuna);
-                    var peca = Partida.Tabuleiro.Pecas.Find(p => p.Codigo == "T");
-                    var mov = new Movimento(peca, (Casa)torreCasa.Peca, (Casa)movimento.CasaOrigem.Peca);
-                    Partida.Movimentos.Push(mov);
 
+                    // Define a linha do rei a partir da casa destino (mesma linha)
+                    var linha = movimento.CasaDestino.Linha;
+
+                    // Decide se é roque pequeno (lado do rei) ou grande (lado da dama)
+                    bool roquePequeno = movimento.CasaDestino.Coluna > movimento.CasaOrigem.Coluna;
+
+                    // Casa origem da torre
+                    int torreColunaOrigem = roquePequeno ? 7 : 0;
+
+                    // Casa destino da torre (lado oposto ao rei)
+                    int torreColunaDestino = roquePequeno ? movimento.CasaDestino.Coluna - 1 : movimento.CasaDestino.Coluna + 1;
+
+                    // Busca a casa da torre origem no tabuleiro
+                    var torreCasaOrigem = Partida.Tabuleiro.Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == torreColunaOrigem);
+
+                    // Busca a casa da torre destino no tabuleiro
+                    var torreCasaDestino = Partida.Tabuleiro.Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == torreColunaDestino);
+
+                    if (torreCasaOrigem == null || torreCasaDestino == null)
+                        throw new Exception("Casas da torre para roque não encontradas");
+
+                    // Move a torre para a casa destino
+                    var torrePeca = torreCasaOrigem.Peca;
+                    torreCasaOrigem.Peca = null;
+                    torreCasaDestino.Peca = torrePeca;
+
+                    // Cria movimento da torre para pilha
+                    var movTorre = new Movimento(torrePeca, torreCasaOrigem, torreCasaDestino);
+                    Partida.Movimentos.Push(movTorre);
+
+                    // Marca peças como movidas
                     movimento.Peca.FoiMovimentada = true;
+                    torrePeca.FoiMovimentada = true;
+
+                    // Atualiza estado
                     PecaSelecionada = null;
                     MovimentosPossiveisPecaSelecionada.Clear();
+
+                    // Empilha o movimento do rei
                     Partida.Movimentos.Push(movimento);
+
                     AoMudarEstado.InvokeAsync();
                 }
                 else
@@ -91,6 +123,7 @@ public partial class PainelTabuleiro
                     AoMudarEstado.InvokeAsync();
                 }
             }
+
 
             #endregion
         }

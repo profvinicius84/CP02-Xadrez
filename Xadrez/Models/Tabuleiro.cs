@@ -67,12 +67,12 @@ public class Tabuleiro : ITabuleiro
         // Peças brancas (Por enquanto Só tem torres e rei para o movimento roque)
         int linha = 0;
         ColocaPeca(new Torre(true), linha, 0);
-        ColocaPeca(new Hades(true), linha, 1);
-        ColocaPeca(new Hades(true), linha, 2);
+        //ColocaPeca(new Hades(true), linha, 1);
+        //ColocaPeca(new Hades(true), linha, 2);
         ColocaPeca(new Rei(true), linha, 3);
-        ColocaPeca(new Hades(true), linha, 4);
-        ColocaPeca(new Hades(true), linha, 5);
-        ColocaPeca(new Hades(true), linha, 6);
+        //ColocaPeca(new Hades(true), linha, 4);
+        //ColocaPeca(new Hades(true), linha, 5);
+        //ColocaPeca(new Hades(true), linha, 6);
         ColocaPeca(new Torre(true), linha, 7);
 
         // Peças pretas (Por enquanto Só tem torres e rei para o movimento roque)
