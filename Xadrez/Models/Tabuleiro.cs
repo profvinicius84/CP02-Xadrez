@@ -78,12 +78,12 @@ public class Tabuleiro : ITabuleiro
         // Peças pretas (Por enquanto Só tem torres e rei para o movimento roque)
         linha = 7;
         ColocaPeca(new Torre(false), linha, 0);
-        ColocaPeca(new Hades(false), linha, 1);
-        ColocaPeca(new Hades(false), linha, 2);
+        //ColocaPeca(new Hades(false), linha, 1);
+        //ColocaPeca(new Hades(false), linha, 2);
         ColocaPeca(new Rei(false), linha, 3);
-        ColocaPeca(new Hades(false), linha, 4);
-        ColocaPeca(new Hades(false), linha, 5);
-        ColocaPeca(new Hades(false), linha, 6);
+        //ColocaPeca(new Hades(false), linha, 4);
+        //ColocaPeca(new Hades(false), linha, 5);
+        //ColocaPeca(new Hades(false), linha, 6);
         ColocaPeca(new Torre(false), linha, 7);
     }
 

@@ -42,7 +42,7 @@ public partial class PainelTabuleiro
     /// <param name="casa">Representa a casa selecionada no tabuleiro.</param>
     public void CliqueCasa(Models.Casa casa)
     {
-        if (PecaSelecionada is null && casa.Peca is not null && Partida.JogadorDaVez.EBranco == casa.Peca.EBranca)
+        if (PecaSelecionada is null && casa.Peca is not null && Partida.JogadorDaVez.EBranco == casa.Peca.EBranca) 
         {
             PecaSelecionada = casa.Peca;
             MovimentosPossiveisPecaSelecionada.AddRange(PecaSelecionada.MovimentosPossiveis(Partida.Tabuleiro));
@@ -95,35 +95,33 @@ public partial class PainelTabuleiro
                     torreCasaOrigem.Peca = null;
                     torreCasaDestino.Peca = torrePeca;
 
-                    // Cria movimento da torre para pilha
+                    // Adiciona o movimento da torre
                     var movTorre = new Movimento(torrePeca, torreCasaOrigem, torreCasaDestino);
                     Partida.Movimentos.Push(movTorre);
 
-                    // Marca peças como movidas
-                    movimento.Peca.FoiMovimentada = true;
+                    // Marca Torre como movida
                     torrePeca.FoiMovimentada = true;
-
-                    // Atualiza estado
-                    PecaSelecionada = null;
-                    MovimentosPossiveisPecaSelecionada.Clear();
-
-                    // Empilha o movimento do rei
-                    Partida.Movimentos.Push(movimento);
-
-                    AoMudarEstado.InvokeAsync();
                 }
                 else
                 {
+                    // Efetua movimentos padrão
                     movimento.CasaOrigem.Peca = null;
                     movimento.CasaDestino.Peca = movimento.Peca;
-                    movimento.Peca.FoiMovimentada = true;
-                    PecaSelecionada = null;
-                    MovimentosPossiveisPecaSelecionada.Clear();
-                    Partida.Movimentos.Push(movimento);
-                    AoMudarEstado.InvokeAsync();
                 }
-            }
 
+                // Marca peça como movida
+                movimento.Peca.FoiMovimentada = true;
+
+                // Reseta peças
+                PecaSelecionada = null;
+                MovimentosPossiveisPecaSelecionada.Clear();
+
+                // Adiciona o movimento do rei
+                Partida.Movimentos.Push(movimento);
+
+                // Atualiza estado
+                AoMudarEstado.InvokeAsync();
+            }
 
             #endregion
         }

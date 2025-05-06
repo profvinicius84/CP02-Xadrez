@@ -169,7 +169,7 @@ namespace Xadrez.Models.Pecas
 
                             var bloqueado = false;
 
-                            if (casaDestino.Linha == 0 && casaDestino.Coluna == 1) // Roque Pequeno
+                            if ((casaDestino.Linha == 0 || casaDestino.Linha == 7) && casaDestino.Coluna == 1) // Roque Pequeno
                             { 
                                 var casa = tabuleiro.Casas.FirstOrDefault(c => c.Linha == 0 && c.Coluna == 2);
 
@@ -183,7 +183,7 @@ namespace Xadrez.Models.Pecas
                                     movimentos.Add(movimentoRoque);
                                 }
                             }
-                            else if (casaDestino.Linha == 0 && casaDestino.Coluna == 6) // Roque Grande
+                            else if ((casaDestino.Linha == 0 || casaDestino.Linha == 7) && casaDestino.Coluna == 6) // Roque Grande
                             {
                                 var l = 0;
                                 for (int col = 4; col < 6; col++)
@@ -222,7 +222,7 @@ namespace Xadrez.Models.Pecas
 
         public bool IsRoque(Casa casaDestino)
         {
-            if (casaDestino.Linha == 0) // Peça Branca
+            if (casaDestino.Linha == 0 || casaDestino.Linha == 7) // Peça Branca ou Preta
             {
                 if (casaDestino.Coluna == 1) // Roque Pequeno
                 {
