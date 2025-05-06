@@ -57,25 +57,116 @@ public class Tabuleiro : ITabuleiro
         }
     }
 
+    /// <summary>
+    /// Posiciona as torres brancas e pretas nas posições iniciais do tabuleiro,
+    /// conforme o padrão do xadrez tradicional.
+    /// </summary>
     public void DistribuiPecas()
     {
-        throw new NotImplementedException();
+        // Coloca as torres nas posições iniciais
+        Casas.First(c => c.Linha == 0 && c.Coluna == 0).Peca = new Torre(true);
+        Casas.First(c => c.Linha == 0 && c.Coluna == 7).Peca = new Torre(true);
+
+        Casas.First(c => c.Linha == 7 && c.Coluna == 0).Peca = new Torre(false);
+        Casas.First(c => c.Linha == 7 && c.Coluna == 7).Peca = new Torre(false);
     }
 
-    public bool ValidaMovimento(Jogador jogador, Movimento movimento)
+
+    /// <summary>
+    /// Verifica se o movimento feito é válido.
+    /// </summary>
+    /// <param name="jogador">O jogador que está tentando mover a peça.</param>
+    /// <param name="tentativa">O movimento que o jogador deseja realizar.</param>
+    /// <returns>Retorna true se o movimento for permitido, senão false.</returns>
+    public bool ValidaMovimento(Jogador jogador, Movimento tentativa)
     {
-        throw new NotImplementedException();
+        // Verifica se existe uma peça para mover
+        if (tentativa.Peca == null)
+        {
+            return false;
+        }
+
+        // Garante que o jogador só possa mover as peças da sua própria cor
+        if (tentativa.Peca.EBranca != jogador.EBranco)
+        {
+            return false;
+        }
+
+        // Lista todos os movimentos que a peça pode fazer
+        var opcoes = tentativa.Peca.MovimentosPossiveis(this);
+
+        // Verifica se o destino está dentro das opções válidas
+        foreach (var mov in opcoes)
+        {
+            if (mov.CasaDestino.Linha == tentativa.CasaDestino.Linha &&
+                mov.CasaDestino.Coluna == tentativa.CasaDestino.Coluna)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    public void ExecutaMovimento(Movimento movimento)
+
+
+    /// <summary>
+    /// Executa o movimento da peça no tabuleiro, movendo-a da casa de origem para a de destino.
+    /// </summary>
+    /// <param name="jogada">Movimento contendo a peça, origem e destino.</param>
+    public void ExecutaMovimento(Movimento jogada)
     {
-        throw new NotImplementedException();
+        var origem = jogada.CasaOrigem;
+        var destino = jogada.CasaDestino;
+
+        // Se houver uma peça no destino, significa que será capturada
+        if (destino.Peca != null)
+        {
+            PecasCapturadas.Add(destino.Peca);
+        }
+
+        // Move a peça da casa de origem para a casa de destino
+        destino.Peca = origem.Peca;
+
+        // Limpa a casa de onde a peça saiu
+        origem.Peca = null;
+
+        // Marca que a peça já foi movimentada
+        if (destino.Peca != null)
+        {
+            destino.Peca.FoiMovimentada = true;
+        }
     }
 
-    public void ReverteMovimento(Movimento movimento)
+
+    /// <summary>
+    /// Reverte um movimento que foi feito
+    /// </summary>
+    /// <param name="jogada">O movimento a ser desfeito.</param>
+    public void ReverteMovimento(Movimento jogada)
     {
-        throw new NotImplementedException();
+        var origem = jogada.CasaOrigem;
+        var destino = jogada.CasaDestino;
+
+        // Devolve a peça para a casa de origem
+        origem.Peca = destino.Peca;
+
+        // Restaura a peça capturada, se houver, na casa de destino
+        destino.Peca = jogada.PecaCapturada;
+
+        // Marca que a peça voltou ao estado "nunca movimentada"
+        if (origem.Peca != null)
+        {
+            origem.Peca.FoiMovimentada = false;
+        }
+
+        // Remove a peça da lista de capturadas, já que ela foi restaurada
+        if (jogada.PecaCapturada != null)
+        {
+            PecasCapturadas.Remove(jogada.PecaCapturada);
+        }
     }
+
 
     public Casa? ObtemCasaPeca(IPeca peca)
     {
