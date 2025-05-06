@@ -1,4 +1,4 @@
-﻿using Xadrez.Models.Pecas;
+using Xadrez.Models.Pecas;
 using System.Linq; // Adicionado para FirstOrDefault() e Any()
 namespace Xadrez.Models;
 using System;
