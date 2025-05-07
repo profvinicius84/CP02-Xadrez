@@ -19,47 +19,39 @@ namespace Xadrez.Models.Pecas
 
         public bool VerificaRoque(Tabuleiro tabuleiro, bool roquePequeno = false)
         {
-            //if (RoqueExecutado)
-            //    throw new InvalidOperationException("O roque já foi executado e não pode ser feito novamente.");
+            var casaRei = tabuleiro.ObtemCasaPeca(this);
+            if (casaRei == null)
+                throw new InvalidOperationException("Rei não está no tabuleiro.");
 
-            ////if (tabuleiro.VerificaXeque(EBranca))
-            ////    return false;
+            // Verifica se o rei já se moveu
+            if (FoiMovimentada)
+                return false;
 
-            //var casaRei = tabuleiro.ObtemCasaPeca(this);
-            //if (casaRei == null) return false;
+            // Encontre a torre correspondente
+            Torre torre = null;
+            int colunaTorre = roquePequeno ? 7 : 0; // Coluna da torre para roque pequeno ou grande
+            var casaTorre = tabuleiro.Casas.FirstOrDefault(c => c.Linha == casaRei.Linha && c.Coluna == colunaTorre);
 
-            //int linha = casaRei.Linha;
-            //int colunaRei = casaRei.Coluna;
-            //int colunaTorre = roquePequeno ? 7 : 0;
+            if (casaTorre?.Peca is not Torre)
+                return false; 
 
-            //var casaTorre = tabuleiro.Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == colunaTorre);
-            //if (casaTorre?.Peca is not ITorre torre || torre.EBranca != EBranca)
-            //    return false;
+            // Verifica se a torre já se moveu
+            if (torre == null || torre.FoiMovimentada)
+                return false;
 
-            //// Verificar se rei ou torre ainda estão em suas casas originais
-            //var casaReiInicial = tabuleiro.Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == 3); 
-            //var casaTorreInicial = casaTorre; 
+            // Verifica se as casas entre o rei e a torre estão desocupadas
+            int passo = roquePequeno ? 1 : -1; // Direção do roque
+            int colunaInicio = roquePequeno ? 4 : 5; // Coluna inicial para verificar as casas entre rei e torre
+            int colunaFinal = roquePequeno ? 6 : 2; // Coluna final onde o rei irá
 
-            //bool reiMoveu = casaReiInicial?.Peca != this;
-            //bool torreMoveu = casaTorreInicial?.Peca != torre;
+            for (int coluna = colunaInicio; coluna != colunaFinal; coluna += passo)
+            {
+                var casaIntermediaria = tabuleiro.Casas.FirstOrDefault(c => c.Linha == casaRei.Linha && c.Coluna == coluna);
+                if (casaIntermediaria?.Peca != null)
+                    return false; // Alguma casa entre o rei e a torre está ocupada
+            }
 
-            //if (reiMoveu || torreMoveu)
-            //    return false;
-
-            //int direcao = roquePequeno ? 1 : -1;
-            //int inicio = colunaRei + direcao;
-            //int fim = roquePequeno ? 6 : 1;
-
-            //for (int col = inicio; roquePequeno ? col <= fim : col >= fim; col += direcao)
-            //{
-            //    var casa = tabuleiro.Casas.FirstOrDefault(c => c.Linha == linha && c.Coluna == col);
-            //    if (casa?.Peca != null)
-            //        return false;
-
-            //    // Se tiver um método para verificar se o rei estaria em xeque ao passar por essa casa, use aqui
-            //}
-
-            return true;
+            return true; // Todas as condições para o roque foram atendidas
         }
 
 
