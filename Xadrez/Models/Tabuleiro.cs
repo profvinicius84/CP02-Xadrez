@@ -61,37 +61,9 @@ public class Tabuleiro : ITabuleiro
     /// <summary>
     /// Distribui todas as peças nas posições iniciais do tabuleiro de xadrez.
     /// </summary>
-    private void DistribuirPecas(List<Casa> Casas)
+    private void DistribuiPecas(List<Casa> Casas)
     {
-        // Pretas
-        Casas[0][0].Peca = new Torre(false);
-        Casas[0][1].Peca = new Cavalo(false);
-        Casas[0][2].Peca = new Bispo(false);
-        Casas[0][3].Peca = new Rainha(false);
-        Casas[0][4].Peca = new Rei(false);
-        Casas[0][5].Peca = new Bispo(false);
-        Casas[0][6].Peca = new Cavalo(false);
-        Casas[0][7].Peca = new Torre(false);
-
-        for (int coluna = 0; coluna < 8; coluna++)
-        {
-            Casas[1][coluna].Peca = new Peao(false);
-        }
-
-        // Brancas
-        Casas[7][0].Peca = new Torre(true);
-        Casas[7][1].Peca = new Cavalo(true);
-        Casas[7][2].Peca = new Bispo(true);
-        Casas[7][3].Peca = new Rainha(true);
-        Casas[7][4].Peca = new Rei(true);
-        Casas[7][5].Peca = new Bispo(true);
-        Casas[7][6].Peca = new Cavalo(true);
-        Casas[7][7].Peca = new Torre(true);
-
-        for (int coluna = 0; coluna < 8; coluna++)
-        {
-            Casas[6][coluna].Peca = new Peao(true);
-        }
+        
     }
 
     /// <summary>
@@ -154,21 +126,51 @@ public class Tabuleiro : ITabuleiro
     /// <returns>A casa onde a peça se encontra, ou null se não encontrada.</returns>
     public Casa ObtemCasaPeca(Peca peca)
     {
-        foreach (var linha in Casas)
-        {
-            foreach (var casa in linha)
-            {
-                if (casa.Peca == peca)
-                    return casa;
-            }
-        }
-        return null;
+        
     }
 
 
+    //Grupo 8 - Feito
     public bool VerificaXeque(bool eBranca)
     {
-        throw new NotImplementedException();
+        // Seleciona as peças do jogador conforme a cor informada
+        var pecasDoJogador = eBranca ? PecasBrancas : PecasPretas;
+
+        // Encontra o rei do jogador
+        IPeca? rei = pecasDoJogador.FirstOrDefault(p => p is IRei);
+        if (rei == null)
+        {
+            // Não encontrou o rei — talvez o jogo esteja em um estado inválido
+            return false;
+        }
+
+        // Encontra a casa onde está o rei
+        Casa? casaDoRei = ObtemCasaPeca(rei);
+        if (casaDoRei == null)
+        {
+            // O rei não está posicionado em nenhuma casa — também um estado inválido
+            return false;
+        }
+
+        // Seleciona as peças inimigas
+        var pecasInimigas = eBranca ? PecasPretas : PecasBrancas;
+
+        // Verifica se alguma peça inimiga pode capturar o rei
+        foreach (var pecaInimiga in pecasInimigas)
+        {
+            var movimentosInimigos = pecaInimiga.MovimentosPossiveis(this);
+            foreach (var movimento in movimentosInimigos)
+            {
+                if (movimento.CasaDestino == casaDoRei)
+                {
+                    // O rei está sob ameaça
+                    return true;
+                }
+            }
+        }
+
+        // Nenhuma peça inimiga ameaça o rei
+        return false;
     }
 
     public bool VerificaXequeMate(bool eBranca)
@@ -201,5 +203,4 @@ public class Tabuleiro : ITabuleiro
         }
         return false;
     }
-
 }
