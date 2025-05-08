@@ -22,7 +22,7 @@ public class Bispo(bool eBranca) : Peca(eBranca), IBispo
 
 
         // Se setivermos em cheque, o bispo não pode se mexer
-        if (Tabuleiro.VerificaXeque(eBranca)){
+        if (tabuleiro.VerificaXeque(eBranca)){
             return movimentos;
         }
 

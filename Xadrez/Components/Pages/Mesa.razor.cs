@@ -48,16 +48,7 @@ public partial class Mesa
         if (Partida.Movimentos.Count > 0)
         {
             var movimento = Partida.Movimentos.Pop();
-            # region Partida.Tabuleiro.ReverteMovimento(movimento)
-            movimento.CasaOrigem.Peca = movimento.Peca;
-            movimento.CasaDestino.Peca = null;
-            if (movimento.PecaCapturada is not null)
-            {
-                movimento.CasaDestino.Peca = movimento.PecaCapturada;
-                Partida.Tabuleiro.PecasCapturadas.Remove(movimento.CasaDestino.Peca);
-                movimento.CasaDestino.Peca.FoiMovimentada = Partida.Movimentos.ToList().Exists(m => m.Peca == movimento.CasaDestino.Peca);
-            }
-            #endregion
+            Partida.Tabuleiro.ReverteMovimento(movimento);            
         }
     }
 

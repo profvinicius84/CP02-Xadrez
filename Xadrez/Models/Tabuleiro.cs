@@ -59,35 +59,69 @@ public class Tabuleiro : ITabuleiro
     }
 
     /// <summary>
-    /// Distribui todas as peças nas posições iniciais do tabuleiro de xadrez.
+    /// Distribui as peças no tabuleiro de xadrez. As peças brancas são colocadas nas linhas 1 e 2, enquanto as peças pretas são colocadas nas linhas 7 e 8.
     /// </summary>
-    private void DistribuiPecas(List<Casa> Casas)
+    public void DistribuiPecas()
     {
-        
+        //Peças brancas
+        Casas[0].Peca = new Torre(true);
+        Casas[1].Peca = new Cavalo(true);
+        Casas[2].Peca = new Bispo(true);
+        Casas[3].Peca = new Rainha(true);
+        Casas[4].Peca = new Rei(true);
+        Casas[5].Peca = new Bispo(true);
+        Casas[6].Peca = new Cavalo(true);
+        Casas[7].Peca = new Torre(true);
+
+        //for (int i = 8; i < 16; i++)
+        //{
+        //    Casas[i].Peca = new Peao(true);
+        //}
+
+        //Peças pretas
+        Casas[63].Peca = new Torre(false);
+        Casas[62].Peca = new Cavalo(false);
+        Casas[61].Peca = new Bispo(false);
+        Casas[60].Peca = new Rei(false);
+        Casas[59].Peca = new Rainha(false);
+        Casas[58].Peca = new Bispo(false);
+        Casas[57].Peca = new Cavalo(false);
+        Casas[56].Peca = new Torre(false);
+
+        //for (int i = 48; i < 56; i++)
+        //{
+        //    Casas[i].Peca = new Peao(false);
+        //}
+
+        Pecas.AddRange(Casas.Where(c => c.Peca is not null).Select(c => c.Peca));
     }
 
-    /// <summary>
-    /// Valida se um movimento é permitido no tabuleiro.
-    /// </summary>
-    /// <param name="movimento">Movimento a ser validado.</param>
-    /// <returns>Retorna verdadeiro se o movimento é válido, caso contrário, falso.</returns>
-    public bool ValidaMovimento(Movimento movimento)
+    public bool ValidaMovimento(Jogador jogador, Movimento movimento)
     {
-        if (movimento == null || movimento.CasaOrigem == null || movimento.CasaDestino == null)
+        if (jogador is not null && jogador.EBranco != movimento.Peca.EBranca)
             return false;
-
-        var movimentosPossiveis = movimento.CasaOrigem.Peca?.MovimentosPossiveis(this);
-
-        if (movimentosPossiveis == null)
+        if (PecasCapturadas.Contains(movimento.Peca) || PecasCapturadas.Contains(movimento.PecaCapturada))
             return false;
-
-        foreach (var mov in movimentosPossiveis)
+        if (!Casas.Contains(movimento.CasaOrigem) || !Casas.Contains(movimento.CasaDestino))
+            return false;
+        if (movimento.Peca != movimento.CasaOrigem.Peca)
+            return false;
+        if (movimento.PecaCapturada is not null)
         {
-            if (mov.CasaDestino == movimento.CasaDestino)
-                return true;
+            if (movimento.PecaCapturada.EBranca == movimento.Peca.EBranca)
+                return false;            
+            if (movimento.Peca is IRei && movimento.PecaCapturada is IRei)
+                return false;
+        }
+        if (movimento.ERoque)
+        {
+            if (movimento.Peca is not IRei)
+                return false;
+            if (!(movimento.Peca as IRei).VerificaRoque(this) && !(movimento.Peca as IRei).VerificaRoque(this, true))
+                return false;
         }
 
-        return false;
+        return true;
     }
 
 
@@ -97,11 +131,28 @@ public class Tabuleiro : ITabuleiro
     /// <param name="movimento">Movimento a ser executado.</param>
     public void ExecutaMovimento(Movimento movimento)
     {
-        if (!ValidaMovimento(movimento))
-            return;
-
-        movimento.CasaDestino.Peca = movimento.CasaOrigem.Peca;
+        if (movimento.PecaCapturada is not null)
+        {
+            movimento.CasaDestino.Peca = null;
+            PecasCapturadas.Add(movimento.PecaCapturada);
+        }
+        movimento.CasaDestino.Peca = movimento.Peca;
         movimento.CasaOrigem.Peca = null;
+        if (movimento.ERoque)
+        {
+            //if (movimento.CasaDestino.Coluna == 6) //Roque pequeno
+            //{
+            //    var casaTorre = ObtemCasaCoordenadas(movimento.CasaDestino.Linha, 7);
+            //    ObtemCasaCoordenadas(movimento.CasaDestino.Linha, 5).Peca = casaTorre.Peca;
+            //    casaTorre.Peca = null;
+            //}
+            //else //Roque grande
+            //{
+            //    var casaTorre = ObtemCasaCoordenadas(movimento.CasaDestino.Linha, 0);
+            //    ObtemCasaCoordenadas(movimento.CasaDestino.Linha, 3).Peca = casaTorre.Peca;
+            //    casaTorre.Peca = null;
+            //}
+        }
     }
 
 
@@ -111,11 +162,28 @@ public class Tabuleiro : ITabuleiro
     /// <param name="movimento">Movimento a ser revertido.</param>
     public void ReverteMovimento(Movimento movimento)
     {
-        if (movimento == null)
-            return;
-
-        movimento.CasaOrigem.Peca = movimento.PecaMovida;
-        movimento.CasaDestino.Peca = movimento.PecaCapturada;
+        movimento.CasaOrigem.Peca = movimento.Peca;
+        movimento.CasaDestino.Peca = null;
+        if (movimento.PecaCapturada is not null)
+        {
+            movimento.CasaDestino.Peca = movimento.PecaCapturada;
+            PecasCapturadas.Remove(movimento.PecaCapturada);
+        }
+        if (movimento.ERoque)
+        {
+            //if (movimento.CasaDestino.Coluna == 6) //Roque pequeno
+            //{
+            //    var casaTorre = ObtemCasaCoordenadas(movimento.CasaDestino.Linha, 5);
+            //    ObtemCasaCoordenadas(movimento.CasaDestino.Linha, 7).Peca = casaTorre.Peca;
+            //    casaTorre.Peca = null;
+            //}
+            //else //Roque grande
+            //{
+            //    var casaTorre = ObtemCasaCoordenadas(movimento.CasaDestino.Linha, 3);
+            //    ObtemCasaCoordenadas(movimento.CasaDestino.Linha, 0).Peca = casaTorre.Peca;
+            //    casaTorre.Peca = null;
+            //}
+        }        
     }
 
 
@@ -124,9 +192,9 @@ public class Tabuleiro : ITabuleiro
     /// </summary>
     /// <param name="peca">Peça a ser localizada.</param>
     /// <returns>A casa onde a peça se encontra, ou null se não encontrada.</returns>
-    public Casa ObtemCasaPeca(Peca peca)
+    public Casa? ObtemCasaPeca(IPeca peca)
     {
-        
+        return Casas.FirstOrDefault(c => c.Peca == peca || (c.Peca is IPeao && (c.Peca as IPeao).PecaPromocao == peca));
     }
 
 
@@ -186,21 +254,21 @@ public class Tabuleiro : ITabuleiro
     /// <returns>Retorna verdadeiro se a casa está sob ataque, caso contrário, falso.</returns>
     public bool VerificaPerigo(Casa casa, bool eBranca)
     {
-        foreach (var linha in Casas)
-        {
-            foreach (var outraCasa in linha)
-            {
-                if (outraCasa.Peca != null && outraCasa.Peca.EBranca != eBranca)
-                {
-                    var movimentosPossiveis = outraCasa.Peca.MovimentosPossiveis(this);
-                    foreach (var movimento in movimentosPossiveis)
-                    {
-                        if (movimento.Destino == casa)
-                            return true;
-                    }
-                }
-            }
-        }
+        //foreach (var linha in Casas)
+        //{
+        //    foreach (var outraCasa in linha)
+        //    {
+        //        if (outraCasa.Peca != null && outraCasa.Peca.EBranca != eBranca)
+        //        {
+        //            var movimentosPossiveis = outraCasa.Peca.MovimentosPossiveis(this);
+        //            foreach (var movimento in movimentosPossiveis)
+        //            {
+        //                if (movimento.Destino == casa)
+        //                    return true;
+        //            }
+        //        }
+        //    }
+        //}
         return false;
     }
 }
